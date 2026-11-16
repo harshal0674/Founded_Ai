@@ -7,12 +7,11 @@ import {
   ShieldAlert,
   BarChart3,
   Settings,
-  ArrowRight,
   Database,
-  ExternalLink,
   Menu,
   X,
-  RefreshCw
+  RefreshCw,
+  ChevronRight
 } from "lucide-react";
 import { api } from "../../api/client";
 
@@ -33,7 +32,7 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
       .then((res) => {
         setDbMode(res.database.mode === "atlas" ? "MongoDB Atlas" : "In-Memory Store");
       })
-      .catch(() => setDbMode("Offline (Mock)"));
+      .catch(() => setDbMode("Offline"));
   }, []);
 
   const handleSeed = async () => {
@@ -42,7 +41,6 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
       const res = await api.seedDemoData();
       setToastMsg(`Seeded ${res.stats.products} products & ${res.stats.sales} sales records.`);
       setTimeout(() => setToastMsg(null), 4000);
-      // Reload current page if on dashboard/inventory
       window.dispatchEvent(new CustomEvent("stockmind:refresh"));
     } catch (e: any) {
       setToastMsg(`Seed error: ${e.message}`);
@@ -63,41 +61,41 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
   ];
 
   return (
-    <div className="min-h-screen bg-paper flex flex-col antialiased">
-      {/* Top Notification Toast */}
+    <div className="min-h-screen bg-[#080808] text-apple-text flex flex-col font-sans antialiased selection:bg-apple-blue/30 selection:text-white">
+      {/* Top Floating Apple Toast */}
       {toastMsg && (
-        <div className="fixed top-4 right-4 z-[var(--z-toast)] bg-graphite text-graphite-ink px-4 py-2.5 rounded-input text-xs font-mono shadow-card border border-rule flex items-center space-x-2 animate-fade-in">
-          <span className="w-2 h-2 rounded-full bg-accent"></span>
+        <div className="fixed top-5 right-6 z-50 bg-[#161616]/95 backdrop-blur-xl text-white px-4 py-2.5 rounded-full text-xs font-medium shadow-apple-elevated border border-apple-border flex items-center space-x-2.5 animate-fade-in">
+          <span className="w-2 h-2 rounded-full bg-apple-blue-bright"></span>
           <span>{toastMsg}</span>
         </div>
       )}
 
-      {/* Main App Layout */}
+      {/* Main Container */}
       <div className="flex-1 flex flex-col md:flex-row">
-        {/* Desktop Sidebar */}
-        <aside className="hidden md:flex flex-col w-64 border-r border-rule bg-paper-2 select-none">
-          {/* Logo & Identity */}
-          <div className="h-16 px-5 border-b border-rule flex items-center justify-between">
-            <button 
-              onClick={() => navigate("/")} 
-              className="text-left group flex items-center space-x-2 focus:outline-none"
+        {/* Desktop Sidebar (Apple Dark Slate) */}
+        <aside className="hidden md:flex flex-col w-64 border-r border-[#1D1D20] bg-[#0A0A0C] select-none">
+          {/* Logo Brand */}
+          <div className="h-16 px-6 border-b border-[#1D1D20] flex items-center justify-between">
+            <button
+              onClick={() => navigate("/")}
+              className="text-left group flex items-center space-x-2.5 focus:outline-none"
             >
-              <div className="w-7 h-7 rounded-sm bg-accent flex items-center justify-center text-accent-ink font-display font-semibold text-xs tracking-tighter">
+              <div className="w-6 h-6 rounded-full bg-apple-blue flex items-center justify-center text-white font-semibold text-xs">
                 SM
               </div>
-              <span className="font-display font-semibold text-ink text-base tracking-tight group-hover:text-accent transition-colors">
+              <span className="font-semibold text-white text-sm tracking-tight group-hover:text-apple-blue-bright transition-colors">
                 StockMind AI
               </span>
             </button>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-rule-2 bg-paper text-muted">
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#161618] border border-apple-border text-apple-text-secondary">
               v1.0
             </span>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="flex-1 p-3 space-y-1">
-            <div className="px-3 py-1.5 text-[11px] font-display font-medium text-muted uppercase tracking-wider">
-              Management
+          {/* Nav List */}
+          <nav className="flex-1 p-3.5 space-y-1">
+            <div className="px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-apple-text-tertiary">
+              Workspace
             </div>
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -106,59 +104,59 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                 <button
                   key={item.route}
                   onClick={() => navigate(item.route)}
-                  className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-input text-sm font-medium transition-colors ${
+                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 ${
                     isActive
-                      ? "bg-accent-wash text-accent font-semibold border-l-2 border-accent"
-                      : "text-ink-2 hover:bg-paper-3 hover:text-ink"
+                      ? "bg-[#18181B] text-white shadow-sm border border-apple-border/80"
+                      : "text-apple-text-secondary hover:text-white hover:bg-[#121214]"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? "text-accent" : "text-muted"}`} />
-                  <span>{item.label}</span>
+                  <Icon className={`w-4 h-4 ${isActive ? "text-apple-blue-bright" : "text-apple-text-tertiary"}`} />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-apple-blue-bright"></span>}
                 </button>
               );
             })}
           </nav>
 
-          {/* System Status & Seed Trigger */}
-          <div className="p-3.5 border-t border-rule bg-paper space-y-2">
-            <div className="flex items-center justify-between text-xs text-muted">
-              <span className="flex items-center space-x-1.5">
-                <Database className="w-3.5 h-3.5 text-accent" />
+          {/* Database Indicator & Reset Demo Trigger */}
+          <div className="p-4 border-t border-[#1D1D20] bg-[#0A0A0C] space-y-3">
+            <div className="flex items-center justify-between text-xs text-apple-text-secondary">
+              <span className="flex items-center space-x-2">
+                <Database className="w-3.5 h-3.5 text-apple-blue-bright" />
                 <span className="font-mono text-[11px]">{dbMode}</span>
               </span>
-              <span className="w-2 h-2 rounded-full bg-success"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-apple-green"></span>
             </div>
             <button
               onClick={handleSeed}
               disabled={seeding}
-              className="w-full keycap text-xs py-1.5 px-2 text-ink-2 flex items-center justify-center space-x-1.5"
-              title="Reset and reload realistic multi-category demo dataset"
+              className="w-full apple-btn-secondary text-[11px] py-2 px-3 flex items-center justify-center space-x-1.5 font-normal"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${seeding ? "animate-spin text-accent" : ""}`} />
-              <span>{seeding ? "Generating..." : "Reload Demo Data"}</span>
+              <RefreshCw className={`w-3 h-3 ${seeding ? "animate-spin text-apple-blue-bright" : ""}`} />
+              <span>{seeding ? "Populating..." : "Reload Clean Demo Data"}</span>
             </button>
           </div>
         </aside>
 
         {/* Mobile Header */}
-        <header className="md:hidden h-14 px-4 border-b border-rule bg-paper-2 flex items-center justify-between">
+        <header className="md:hidden h-14 px-4 border-b border-[#1D1D20] bg-[#0A0A0C] flex items-center justify-between">
           <button onClick={() => navigate("/")} className="flex items-center space-x-2">
-            <div className="w-6 h-6 rounded-sm bg-accent flex items-center justify-center text-accent-ink font-display font-semibold text-xs">
+            <div className="w-6 h-6 rounded-full bg-apple-blue flex items-center justify-center text-white font-semibold text-xs">
               SM
             </div>
-            <span className="font-display font-semibold text-ink text-sm">StockMind AI</span>
+            <span className="font-semibold text-white text-sm">StockMind AI</span>
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 rounded-input border border-rule text-ink-2"
+            className="p-1.5 rounded-lg border border-apple-border text-apple-text-secondary"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </header>
 
-        {/* Mobile Dropdown Menu */}
+        {/* Mobile Nav Overlay */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-b border-rule bg-paper p-3 space-y-1">
+          <div className="md:hidden border-b border-[#1D1D20] bg-[#0A0A0C] p-4 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentRoute === item.route;
@@ -169,11 +167,11 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                     navigate(item.route);
                     setMobileMenuOpen(false);
                   }}
-                  className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-input text-sm ${
-                    isActive ? "bg-accent-wash text-accent font-semibold" : "text-ink-2"
+                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs ${
+                    isActive ? "bg-[#18181B] text-white font-medium" : "text-apple-text-secondary"
                   }`}
                 >
-                  <Icon className="w-4 h-4 text-muted" />
+                  <Icon className="w-4 h-4" />
                   <span>{item.label}</span>
                 </button>
               );
@@ -181,8 +179,8 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
           </div>
         )}
 
-        {/* Content Viewport */}
-        <main className="flex-1 overflow-y-auto bg-paper flex flex-col">
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto bg-[#080808] flex flex-col">
           {children}
         </main>
       </div>

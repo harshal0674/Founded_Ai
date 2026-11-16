@@ -1,34 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>StockMind AI — Intelligent Inventory & Demand Forecasting</title>
-    <!-- Hallmark Typography: Familjen Grotesk + IBM Plex Sans + JetBrains Mono -->
+    <!-- Apple-grade Typography: Inter + System SF Pro fallbacks -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-paper text-ink antialiased selection:bg-accent-wash selection:text-ink">
+  <body class="bg-[#000000] text-[#F5F5F7] antialiased selection:bg-[#0071E3]/30 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      window.hallmarkSlots = (m) => {
-        for (const [k, v] of Object.entries(m)) {
-          const s = document.querySelector(`[data-slot="${k}"]`);
-          if (!s) continue;
-          const im = new Image();
-          im.src = typeof v === 'string' ? v : v.src;
-          im.alt = (typeof v === 'object' && v.alt) || s.dataset.alt || '';
-          s.querySelectorAll(':scope > img').forEach((o) => o.remove());
-          s.prepend(im);
-        }
-      };
-      document.querySelectorAll('[data-slot] img').forEach((i) => {
-        if (i.complete && !i.naturalWidth) i.remove();
-        else i.addEventListener('error', () => i.remove(), { once: true });
-      });
-    </script>
   </body>
 </html>

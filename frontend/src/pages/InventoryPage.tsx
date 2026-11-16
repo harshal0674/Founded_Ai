@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
-  Boxes,
   Search,
-  Filter,
   Plus,
   Edit2,
   Trash2,
   RefreshCw,
-  AlertCircle,
   PackagePlus,
-  Check,
   X
 } from "lucide-react";
 import { api } from "../api/client";
@@ -34,7 +30,7 @@ export const InventoryPage: React.FC = () => {
   // Form states
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [restockQty, setRestockQty] = useState<number>(20);
+  const [restockQty, setRestockQty] = useState<number>(25);
 
   const [formData, setFormData] = useState<ProductCreate>({
     name: "",
@@ -174,15 +170,15 @@ export const InventoryPage: React.FC = () => {
   const categories = ["all", "Industrial Sensors", "Computer Hardware", "Electronics", "Packaging", "Office Tech"];
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-[var(--container)] mx-auto w-full">
+    <div className="p-6 md:p-10 space-y-6 max-w-7xl mx-auto w-full">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-rule">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#1D1D20]">
         <div>
-          <h1 className="font-display text-2xl md:text-3xl font-semibold text-ink tracking-tight">
-            Inventory Catalog & SKU Control
+          <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
+            Inventory Catalog
           </h1>
-          <p className="text-xs md:text-sm text-ink-2 mt-0.5">
-            Full lifecycle CRUD, stock level indicators, atomic deductions, and supplier replenishment channels.
+          <p className="text-xs md:text-sm text-apple-text-secondary mt-1">
+            Complete SKU lifecycle, on-hand thresholds, valuation, and supplier lead times.
           </p>
         </div>
 
@@ -191,24 +187,24 @@ export const InventoryPage: React.FC = () => {
             resetForm();
             setIsAddModalOpen(true);
           }}
-          className="keycap keycap-primary text-xs py-2 px-3.5 flex items-center space-x-1.5 self-start sm:self-auto"
+          className="apple-btn-primary text-xs py-2 px-4 flex items-center space-x-1.5 self-start sm:self-auto"
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>Add New Product</span>
+          <span>Add Product</span>
         </button>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-paper p-3 rounded-card border border-rule">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 apple-card p-3.5">
         {/* Search */}
         <div className="md:col-span-5 relative">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-apple-text-secondary" />
           <input
             type="text"
             placeholder="Search by product name or SKU..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-xs bg-paper-2 border border-rule rounded-input text-ink focus:outline-none focus:border-accent"
+            className="w-full pl-10 pr-3 py-2 text-xs bg-[#18181C] border border-[#26262B] rounded-xl text-white placeholder-apple-text-tertiary focus:outline-none focus:border-apple-blue-bright"
           />
         </div>
 
@@ -217,7 +213,7 @@ export const InventoryPage: React.FC = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full py-1.5 px-3 text-xs bg-paper-2 border border-rule rounded-input text-ink focus:outline-none focus:border-accent"
+            className="w-full py-2 px-3 text-xs bg-[#18181C] border border-[#26262B] rounded-xl text-apple-text focus:outline-none focus:border-apple-blue-bright"
           >
             {categories.map((c) => (
               <option key={c} value={c}>
@@ -232,9 +228,9 @@ export const InventoryPage: React.FC = () => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="w-full py-1.5 px-3 text-xs bg-paper-2 border border-rule rounded-input text-ink focus:outline-none focus:border-accent"
+            className="w-full py-2 px-3 text-xs bg-[#18181C] border border-[#26262B] rounded-xl text-apple-text focus:outline-none focus:border-apple-blue-bright"
           >
-            <option value="all">Status: All Statuses</option>
+            <option value="all">Status: All</option>
             <option value="in_stock">In Stock</option>
             <option value="low_stock">Low Stock Warning</option>
             <option value="out_of_stock">Out of Stock</option>
@@ -242,100 +238,100 @@ export const InventoryPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Product Table */}
-      <div className="rounded-card border border-rule bg-paper shadow-card overflow-hidden">
+      {/* Product Table (Apple Clean Table) */}
+      <div className="apple-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-paper-2 border-b border-rule font-mono text-[11px] text-muted">
+            <thead className="bg-[#151518] border-b border-[#232327] font-mono text-[11px] text-apple-text-secondary">
               <tr>
-                <th className="py-3 px-4 font-medium">Product / SKU</th>
-                <th className="py-3 px-4 font-medium">Category</th>
-                <th className="py-3 px-4 font-medium text-right">On-Hand Stock</th>
-                <th className="py-3 px-4 font-medium text-right">Min Stock</th>
-                <th className="py-3 px-4 font-medium text-right">Unit Price</th>
-                <th className="py-3 px-4 font-medium text-right">Inventory Value</th>
-                <th className="py-3 px-4 font-medium">Status</th>
-                <th className="py-3 px-4 font-medium text-right">Actions</th>
+                <th className="py-3.5 px-5 font-medium">Product / SKU</th>
+                <th className="py-3.5 px-5 font-medium">Category</th>
+                <th className="py-3.5 px-5 font-medium text-right">On-Hand Stock</th>
+                <th className="py-3.5 px-5 font-medium text-right">Min Stock</th>
+                <th className="py-3.5 px-5 font-medium text-right">Unit Price</th>
+                <th className="py-3.5 px-5 font-medium text-right">Stock Valuation</th>
+                <th className="py-3.5 px-5 font-medium">Status</th>
+                <th className="py-3.5 px-5 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-rule font-body">
+            <tbody className="divide-y divide-[#1D1D22]">
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-muted font-mono">
+                  <td colSpan={8} className="py-12 text-center text-apple-text-secondary font-mono">
                     <div className="flex items-center justify-center space-x-2">
-                      <RefreshCw className="w-4 h-4 animate-spin text-accent" />
+                      <RefreshCw className="w-4 h-4 animate-spin text-apple-blue-bright" />
                       <span>Loading inventory catalog...</span>
                     </div>
                   </td>
                 </tr>
               ) : products.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-muted font-mono">
-                    No products matched your search or filters.
+                  <td colSpan={8} className="py-12 text-center text-apple-text-secondary font-mono">
+                    No products found matching your search.
                   </td>
                 </tr>
               ) : (
                 products.map((p) => {
                   let badge = (
-                    <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[11px] font-mono bg-success/10 text-success border border-success/30">
-                      <span>In Stock</span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-green/10 text-apple-green border border-apple-green/20">
+                      In Stock
                     </span>
                   );
                   if (p.stock_status === "low_stock") {
                     badge = (
-                      <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[11px] font-mono bg-amber-500/10 text-amber-700 border border-amber-500/30">
-                        <span>Low Stock</span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-orange/10 text-apple-orange border border-apple-orange/20">
+                        Low Stock
                       </span>
                     );
                   } else if (p.stock_status === "out_of_stock") {
                     badge = (
-                      <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[11px] font-mono bg-danger/10 text-danger border border-danger/30 font-semibold">
-                        <span>Stockout</span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-red/10 text-apple-red border border-apple-red/20 font-semibold">
+                        Stockout
                       </span>
                     );
                   }
 
                   return (
-                    <tr key={p.id} className="hover:bg-paper-2 transition-colors">
-                      <td className="py-3 px-4">
-                        <div className="font-semibold text-ink">{p.name}</div>
-                        <div className="font-mono text-[11px] text-muted">{p.sku}</div>
+                    <tr key={p.id} className="hover:bg-[#16161A] transition-colors">
+                      <td className="py-4 px-5">
+                        <div className="font-semibold text-white">{p.name}</div>
+                        <div className="font-mono text-[11px] text-apple-text-secondary">{p.sku}</div>
                       </td>
-                      <td className="py-3 px-4 text-ink-2">{p.category}</td>
-                      <td className="py-3 px-4 text-right font-mono font-medium text-ink">
+                      <td className="py-4 px-5 text-apple-text-secondary">{p.category}</td>
+                      <td className="py-4 px-5 text-right font-mono font-medium text-white">
                         {p.current_stock.toLocaleString()}
                       </td>
-                      <td className="py-3 px-4 text-right font-mono text-muted">
+                      <td className="py-4 px-5 text-right font-mono text-apple-text-secondary">
                         {p.min_stock_level}
                       </td>
-                      <td className="py-3 px-4 text-right font-mono text-ink">
+                      <td className="py-4 px-5 text-right font-mono text-white">
                         ${p.selling_price.toFixed(2)}
                       </td>
-                      <td className="py-3 px-4 text-right font-mono font-medium text-ink">
+                      <td className="py-4 px-5 text-right font-mono font-medium text-white">
                         ${p.total_value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
-                      <td className="py-3 px-4">{badge}</td>
-                      <td className="py-3 px-4 text-right space-x-1 whitespace-nowrap">
+                      <td className="py-4 px-5">{badge}</td>
+                      <td className="py-4 px-5 text-right space-x-1.5 whitespace-nowrap">
                         <button
                           onClick={() => openRestockModal(p)}
-                          className="p-1.5 rounded hover:bg-accent-wash text-accent"
+                          className="p-1.5 rounded-lg hover:bg-apple-blue/20 text-apple-blue-bright transition-colors"
                           title="Quick Restock"
                         >
-                          <PackagePlus className="w-3.5 h-3.5" />
+                          <PackagePlus className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => openEditModal(p)}
-                          className="p-1.5 rounded hover:bg-paper-3 text-ink-2"
+                          className="p-1.5 rounded-lg hover:bg-[#25252A] text-apple-text-secondary hover:text-white transition-colors"
                           title="Edit Product"
                         >
-                          <Edit2 className="w-3.5 h-3.5" />
+                          <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(p.id, p.name)}
-                          className="p-1.5 rounded hover:bg-danger/10 text-danger"
+                          className="p-1.5 rounded-lg hover:bg-apple-red/20 text-apple-red transition-colors"
                           title="Delete Product"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </td>
                     </tr>
@@ -349,61 +345,61 @@ export const InventoryPage: React.FC = () => {
 
       {/* Add / Edit Modal */}
       {(isAddModalOpen || isEditModalOpen) && (
-        <div className="fixed inset-0 z-[var(--z-modal)] bg-graphite/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-paper rounded-card border border-rule w-full max-w-xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-rule">
-              <h3 className="font-display font-semibold text-lg text-ink">
-                {isAddModalOpen ? "Create New Inventory SKU" : `Edit SKU: ${activeProduct?.sku}`}
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#121214] rounded-2xl border border-[#28282D] w-full max-w-xl shadow-2xl p-6 md:p-8 space-y-5 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-4 border-b border-[#232327]">
+              <h3 className="text-lg font-semibold text-white tracking-tight">
+                {isAddModalOpen ? "New Inventory SKU" : `Edit SKU: ${activeProduct?.sku}`}
               </h3>
               <button
                 onClick={() => {
                   setIsAddModalOpen(false);
                   setIsEditModalOpen(false);
                 }}
-                className="text-muted hover:text-ink"
+                className="text-apple-text-secondary hover:text-white"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             {formError && (
-              <div className="p-3 bg-danger/10 border border-danger/30 rounded text-xs text-danger">
+              <div className="p-3 bg-apple-red/10 border border-apple-red/30 rounded-xl text-xs text-apple-red">
                 {formError}
               </div>
             )}
 
             <form onSubmit={isAddModalOpen ? handleCreateSubmit : handleEditSubmit} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3.5">
                 <div className="col-span-2">
-                  <label className="block text-muted font-medium mb-1">Product Name *</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">Product Name *</label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full p-2 bg-paper-2 border border-rule rounded-input text-ink focus:outline-none focus:border-accent"
-                    placeholder="e.g. Ultra-Fast USB-C PD Cable"
+                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white focus:outline-none focus:border-apple-blue-bright"
+                    placeholder="e.g. Optical Sensor Module"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-muted font-medium mb-1">SKU Code *</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">SKU Code *</label>
                   <input
                     type="text"
                     required
                     value={formData.sku}
                     onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                    className="w-full p-2 bg-paper-2 border border-rule rounded-input text-ink font-mono focus:outline-none focus:border-accent"
-                    placeholder="e.g. CAB-USBC-240"
+                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
+                    placeholder="e.g. SEN-OPT-01"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-muted font-medium mb-1">Category *</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">Category *</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full p-2 bg-paper-2 border border-rule rounded-input text-ink focus:outline-none focus:border-accent"
+                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white focus:outline-none focus:border-apple-blue-bright"
                   >
                     <option value="Electronics">Electronics</option>
                     <option value="Computer Hardware">Computer Hardware</option>
@@ -414,31 +410,31 @@ export const InventoryPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-muted font-medium mb-1">Current Stock Level *</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">Current Stock Level *</label>
                   <input
                     type="number"
                     min="0"
                     required
                     value={formData.current_stock}
                     onChange={(e) => setFormData({ ...formData, current_stock: Number(e.target.value) })}
-                    className="w-full p-2 bg-paper-2 border border-rule rounded-input text-ink font-mono focus:outline-none focus:border-accent"
+                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-muted font-medium mb-1">Minimum Safety Stock *</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">Min Safety Threshold *</label>
                   <input
                     type="number"
                     min="0"
                     required
                     value={formData.min_stock_level}
                     onChange={(e) => setFormData({ ...formData, min_stock_level: Number(e.target.value) })}
-                    className="w-full p-2 bg-paper-2 border border-rule rounded-input text-ink font-mono focus:outline-none focus:border-accent"
+                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-muted font-medium mb-1">Unit Cost ($) *</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">Unit Cost ($) *</label>
                   <input
                     type="number"
                     step="0.01"
@@ -446,12 +442,12 @@ export const InventoryPage: React.FC = () => {
                     required
                     value={formData.unit_cost}
                     onChange={(e) => setFormData({ ...formData, unit_cost: Number(e.target.value) })}
-                    className="w-full p-2 bg-paper-2 border border-rule rounded-input text-ink font-mono focus:outline-none focus:border-accent"
+                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-muted font-medium mb-1">Selling Price ($) *</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">Selling Price ($) *</label>
                   <input
                     type="number"
                     step="0.01"
@@ -459,48 +455,48 @@ export const InventoryPage: React.FC = () => {
                     required
                     value={formData.selling_price}
                     onChange={(e) => setFormData({ ...formData, selling_price: Number(e.target.value) })}
-                    className="w-full p-2 bg-paper-2 border border-rule rounded-input text-ink font-mono focus:outline-none focus:border-accent"
+                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-muted font-medium mb-1">Supplier Lead Time (Days) *</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">Lead Time (Days) *</label>
                   <input
                     type="number"
                     min="1"
                     required
                     value={formData.lead_time_days}
                     onChange={(e) => setFormData({ ...formData, lead_time_days: Number(e.target.value) })}
-                    className="w-full p-2 bg-paper-2 border border-rule rounded-input text-ink font-mono focus:outline-none focus:border-accent"
+                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-muted font-medium mb-1">Supplier Name</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">Supplier Name</label>
                   <input
                     type="text"
                     value={formData.supplier_name || ""}
                     onChange={(e) => setFormData({ ...formData, supplier_name: e.target.value })}
-                    className="w-full p-2 bg-paper-2 border border-rule rounded-input text-ink focus:outline-none focus:border-accent"
+                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white focus:outline-none focus:border-apple-blue-bright"
                   />
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-rule flex items-center justify-end space-x-2">
+              <div className="pt-4 border-t border-[#232327] flex items-center justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => {
                     setIsAddModalOpen(false);
                     setIsEditModalOpen(false);
                   }}
-                  className="keycap text-xs py-2 px-3 text-ink-2"
+                  className="apple-btn-secondary text-xs py-2 px-4"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="keycap keycap-primary text-xs py-2 px-4"
+                  className="apple-btn-primary text-xs py-2 px-5"
                 >
                   {formLoading ? "Saving..." : isAddModalOpen ? "Create Product" : "Save Changes"}
                 </button>
@@ -512,57 +508,59 @@ export const InventoryPage: React.FC = () => {
 
       {/* Restock Modal */}
       {isRestockModalOpen && activeProduct && (
-        <div className="fixed inset-0 z-[var(--z-modal)] bg-graphite/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-paper rounded-card border border-rule w-full max-w-md shadow-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-rule">
-              <h3 className="font-display font-semibold text-base text-ink">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#121214] rounded-2xl border border-[#28282D] w-full max-w-md shadow-2xl p-6 md:p-8 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-[#232327]">
+              <h3 className="text-base font-semibold text-white tracking-tight">
                 Restock: {activeProduct.name}
               </h3>
-              <button onClick={() => setIsRestockModalOpen(false)} className="text-muted hover:text-ink">
-                <X className="w-4 h-4" />
+              <button onClick={() => setIsRestockModalOpen(false)} className="text-apple-text-secondary hover:text-white">
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleRestockSubmit} className="space-y-4 text-xs">
-              <div className="p-3 bg-paper-2 rounded border border-rule space-y-1 font-mono">
+              <div className="p-3.5 bg-[#18181C] rounded-xl border border-apple-border space-y-1.5 font-mono">
                 <div className="flex justify-between">
-                  <span className="text-muted">Current Stock:</span>
-                  <span className="text-ink font-semibold">{activeProduct.current_stock} units</span>
+                  <span className="text-apple-text-secondary">Current On-Hand:</span>
+                  <span className="text-white font-semibold">{activeProduct.current_stock} units</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted">Unit Cost:</span>
-                  <span className="text-ink">${activeProduct.unit_cost.toFixed(2)}</span>
+                  <span className="text-apple-text-secondary">Unit Cost:</span>
+                  <span className="text-white">${activeProduct.unit_cost.toFixed(2)}</span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-muted font-medium mb-1">Replenishment Quantity (Units) *</label>
+                <label className="block text-apple-text-secondary font-medium mb-1.5">
+                  Replenishment Quantity (Units) *
+                </label>
                 <input
                   type="number"
                   min="1"
                   required
                   value={restockQty}
                   onChange={(e) => setRestockQty(Number(e.target.value))}
-                  className="w-full p-2.5 bg-paper-2 border border-rule rounded-input text-ink font-mono text-sm focus:outline-none focus:border-accent"
+                  className="w-full p-3 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono text-sm focus:outline-none focus:border-apple-blue-bright"
                 />
               </div>
 
-              <div className="text-[11px] font-mono text-muted">
+              <div className="text-[11px] font-mono text-apple-text-secondary">
                 Estimated Capital Outlay: ${(restockQty * activeProduct.unit_cost).toFixed(2)}
               </div>
 
-              <div className="pt-2 border-t border-rule flex items-center justify-end space-x-2">
+              <div className="pt-3 border-t border-[#232327] flex items-center justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => setIsRestockModalOpen(false)}
-                  className="keycap text-xs py-2 px-3 text-ink-2"
+                  className="apple-btn-secondary text-xs py-2 px-4"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="keycap keycap-primary text-xs py-2 px-4"
+                  className="apple-btn-primary text-xs py-2 px-5"
                 >
                   {formLoading ? "Recording..." : "Confirm Inbound Stock"}
                 </button>
