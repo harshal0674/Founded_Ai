@@ -1,0 +1,66 @@
+/* Hallmark · shape: Split Studio · genre: modern-minimal · theme: Cobalt (deal 1/3, seed stockmind-ai-powered-inventory-management-3f8d·79341946·2026-11-16·r0) · job: try · draw: e2dbda
+ * hero: Stage · nav: edge-aligned · footer: mast · imagery: none · signature: live interactive inventory trajectory forecast
+ * axes: light/grotesk-sans/cool · posture: restrained · contrast: pass · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P_ H_ E_ S_ R_ V_ · weakest: _, live ASCII data flow and keycap controls */
+@import url("./tokens.css");
+@import url("./base.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .keycap {
+    border: var(--rule-hair) solid var(--color-rule-2);
+    border-radius: var(--radius-input);
+    background: var(--color-key-face);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-weight: 500;
+    box-shadow: var(--shadow-key);
+    transition-property: transform, box-shadow, background-color, border-color, color;
+    transition-duration: var(--dur-micro);
+    transition-timing-function: var(--ease-out);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+  }
+  .keycap:hover {
+    transform: translateY(-1px);
+    background: var(--color-paper);
+  }
+  .keycap:active {
+    transform: translateY(2px);
+    box-shadow: var(--shadow-key-press);
+  }
+  .keycap:disabled, .keycap[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .keycap-primary {
+    background: var(--color-accent);
+    border-color: var(--color-accent-edge);
+    color: var(--color-accent-ink);
+    box-shadow: var(--shadow-key-accent);
+  }
+  .keycap-primary:hover {
+    background: var(--color-accent-deep);
+    color: var(--color-accent-ink);
+  }
+  .panel-cut {
+    border: var(--rule-hair) solid var(--color-rule);
+    border-radius: var(--radius-card);
+    background: var(--color-paper);
+    box-shadow: var(--shadow-card);
+  }
+  .graphite-panel {
+    background: var(--color-graphite);
+    color: var(--color-graphite-ink);
+    border: var(--rule-hair) solid var(--color-graphite-2);
+  }
+}
