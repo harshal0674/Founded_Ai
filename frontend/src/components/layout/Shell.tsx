@@ -179,9 +179,26 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
           </div>
         )}
 
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto bg-[#080808] flex flex-col">
-          {children}
+        {/* Main Content Area with Ambient Lighting & Grid */}
+        <main className="flex-1 overflow-y-auto bg-[#080808] flex flex-col relative">
+          {/* Subtle Ambient Background Grid & Radial Spotlight */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.18]"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px)
+              `,
+              backgroundSize: "48px 48px",
+              maskImage: "radial-gradient(ellipse at 50% 10%, black 20%, transparent 75%)",
+              WebkitMaskImage: "radial-gradient(ellipse at 50% 10%, black 20%, transparent 75%)",
+            }}
+          />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-apple-blue/5 rounded-full blur-[120px] pointer-events-none" />
+
+          <div className="relative z-10 flex-1 flex flex-col">
+            {children}
+          </div>
         </main>
       </div>
     </div>
