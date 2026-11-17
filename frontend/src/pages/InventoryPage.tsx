@@ -35,9 +35,9 @@ export const InventoryPage: React.FC = () => {
   // Form states
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [restockQty, setRestockQty] = useState<number>(25);
+  const [restockQty, setRestockQty] = useState<number | string>(25);
 
-  const [formData, setFormData] = useState<ProductCreate>({
+  const [formData, setFormData] = useState<any>({
     name: "",
     sku: "",
     category: "Retail & FMCG",
@@ -77,7 +77,7 @@ export const InventoryPage: React.FC = () => {
   const generateAutoSku = () => {
     const prefix = formData.category.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, "SKU");
     const rand = Math.floor(1000 + Math.random() * 9000);
-    setFormData((prev) => ({ ...prev, sku: `${prefix}-${rand}` }));
+    setFormData((prev: any) => ({ ...prev, sku: `${prefix}-${rand}` }));
   };
 
   const handleCreateSubmit = async (e: React.FormEvent) => {
@@ -85,7 +85,15 @@ export const InventoryPage: React.FC = () => {
     setFormLoading(true);
     setFormError(null);
     try {
-      await api.createProduct(formData);
+      const payload: ProductCreate = {
+        ...formData,
+        current_stock: Number(formData.current_stock) || 0,
+        min_stock_level: Number(formData.min_stock_level) || 0,
+        unit_cost: Number(formData.unit_cost) || 0,
+        selling_price: Number(formData.selling_price) || 0,
+        lead_time_days: Number(formData.lead_time_days) || 1,
+      };
+      await api.createProduct(payload);
       setIsAddModalOpen(false);
       resetForm();
       loadProducts();
@@ -102,7 +110,15 @@ export const InventoryPage: React.FC = () => {
     setFormLoading(true);
     setFormError(null);
     try {
-      await api.updateProduct(activeProduct.id, formData);
+      const payload = {
+        ...formData,
+        current_stock: Number(formData.current_stock) || 0,
+        min_stock_level: Number(formData.min_stock_level) || 0,
+        unit_cost: Number(formData.unit_cost) || 0,
+        selling_price: Number(formData.selling_price) || 0,
+        lead_time_days: Number(formData.lead_time_days) || 1,
+      };
+      await api.updateProduct(activeProduct.id, payload);
       setIsEditModalOpen(false);
       setActiveProduct(null);
       loadProducts();
@@ -128,9 +144,14 @@ export const InventoryPage: React.FC = () => {
   const handleRestockSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeProduct) return;
+    const finalQty = Number(restockQty);
+    if (!finalQty || finalQty <= 0) {
+      alert("Please enter a valid restock quantity of at least 1 unit.");
+      return;
+    }
     setFormLoading(true);
     try {
-      await api.restockProduct(activeProduct.id, restockQty);
+      await api.restockProduct(activeProduct.id, finalQty);
       setIsRestockModalOpen(false);
       setActiveProduct(null);
       loadProducts();
@@ -537,7 +558,10 @@ export const InventoryPage: React.FC = () => {
                     min="0"
                     required
                     value={formData.current_stock}
-                    onChange={(e) => setFormData({ ...formData, current_stock: Number(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, current_stock: e.target.value === "" ? "" : Number(e.target.value) })}
+                    onBlur={() => {
+                      if (formData.current_stock === "") setFormData((prev: any) => ({ ...prev, current_stock: 0 }));
+                    }}
                     className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
                   />
                 </div>
@@ -549,7 +573,10 @@ export const InventoryPage: React.FC = () => {
                     min="0"
                     required
                     value={formData.min_stock_level}
-                    onChange={(e) => setFormData({ ...formData, min_stock_level: Number(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value === "" ? "" : Number(e.target.value) })}
+                    onBlur={() => {
+                      if (formData.min_stock_level === "") setFormData((prev: any) => ({ ...prev, min_stock_level: 0 }));
+                    }}
                     className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
                   />
                 </div>
@@ -562,7 +589,10 @@ export const InventoryPage: React.FC = () => {
                     min="0"
                     required
                     value={formData.unit_cost}
-                    onChange={(e) => setFormData({ ...formData, unit_cost: Number(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, unit_cost: e.target.value === "" ? "" : e.target.value })}
+                    onBlur={() => {
+                      if (formData.unit_cost === "") setFormData((prev: any) => ({ ...prev, unit_cost: 0 }));
+                    }}
                     className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
                     placeholder="e.g. 250.00"
                   />
@@ -576,7 +606,10 @@ export const InventoryPage: React.FC = () => {
                     min="0"
                     required
                     value={formData.selling_price}
-                    onChange={(e) => setFormData({ ...formData, selling_price: Number(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, selling_price: e.target.value === "" ? "" : e.target.value })}
+                    onBlur={() => {
+                      if (formData.selling_price === "") setFormData((prev: any) => ({ ...prev, selling_price: 0 }));
+                    }}
                     className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
                     placeholder="e.g. 499.00"
                   />
@@ -589,7 +622,12 @@ export const InventoryPage: React.FC = () => {
                     min="1"
                     required
                     value={formData.lead_time_days}
-                    onChange={(e) => setFormData({ ...formData, lead_time_days: Number(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, lead_time_days: e.target.value === "" ? "" : Number(e.target.value) })}
+                    onBlur={() => {
+                      if (formData.lead_time_days === "" || Number(formData.lead_time_days) <= 0) {
+                        setFormData((prev: any) => ({ ...prev, lead_time_days: 1 }));
+                      }
+                    }}
                     className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
                   />
                 </div>
@@ -667,13 +705,18 @@ export const InventoryPage: React.FC = () => {
                   min="1"
                   required
                   value={restockQty}
-                  onChange={(e) => setRestockQty(Number(e.target.value))}
+                  onChange={(e) => setRestockQty(e.target.value)}
+                  onBlur={() => {
+                    if (restockQty === "" || Number(restockQty) <= 0) {
+                      setRestockQty(25);
+                    }
+                  }}
                   className="w-full p-3 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono text-sm focus:outline-none focus:border-apple-blue-bright"
                 />
               </div>
 
               <div className="text-[11px] font-mono text-apple-text-secondary">
-                Estimated Capital Outlay: <strong className="text-white">{formatCurrency(restockQty * activeProduct.unit_cost)}</strong>
+                Estimated Capital Outlay: <strong className="text-white">{formatCurrency((Number(restockQty) || 0) * activeProduct.unit_cost)}</strong>
               </div>
 
               <div className="pt-3 border-t border-[#232327] flex items-center justify-end space-x-3">

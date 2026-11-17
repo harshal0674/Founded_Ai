@@ -12,7 +12,7 @@ export const SalesPage: React.FC = () => {
 
   // New Sale Form
   const [selectedProductId, setSelectedProductId] = useState<string>("");
-  const [quantity, setQuantity] = useState<number>(1);
+  const [quantity, setQuantity] = useState<number | string>(1);
   const [customerType, setCustomerType] = useState<string>("retail");
   const [customPrice, setCustomPrice] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
@@ -45,14 +45,22 @@ export const SalesPage: React.FC = () => {
 
   const selectedProduct = products.find((p) => p.id === selectedProductId);
   const unitPrice = customPrice !== "" ? Number(customPrice) : selectedProduct?.selling_price || 0;
-  const totalPrice = (unitPrice * quantity).toFixed(2);
-  const isStockInsufficient = selectedProduct ? quantity > selectedProduct.current_stock : false;
+  const numQty = quantity === "" ? 0 : Number(quantity);
+  const totalPrice = (unitPrice * numQty).toFixed(2);
+  const isStockInsufficient = selectedProduct ? numQty > selectedProduct.current_stock : false;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProductId) return;
-    if (isStockInsufficient) {
-      setFormError(`Cannot place order: requested ${quantity} units, but only ${selectedProduct?.current_stock} available.`);
+    
+    const finalQty = Number(quantity);
+    if (!finalQty || finalQty <= 0) {
+      setFormError("Please enter a valid quantity of at least 1 unit.");
+      return;
+    }
+
+    if (selectedProduct && finalQty > selectedProduct.current_stock) {
+      setFormError(`Cannot place order: requested ${finalQty} units, but only ${selectedProduct.current_stock} available.`);
       return;
     }
 
@@ -63,14 +71,14 @@ export const SalesPage: React.FC = () => {
     try {
       const payload: SaleCreate = {
         product_id: selectedProductId,
-        quantity: quantity,
+        quantity: finalQty,
         customer_type: customerType,
         custom_price: customPrice !== "" ? Number(customPrice) : undefined,
         notes: notes || undefined,
       };
 
       await api.recordSale(payload);
-      setFormSuccess(`Order recorded! Atomically deducted ${quantity} units from active inventory.`);
+      setFormSuccess(`Order recorded! Atomically deducted ${finalQty} units from active inventory.`);
       setQuantity(1);
       setNotes("");
       loadData();
@@ -182,9 +190,16 @@ export const SalesPage: React.FC = () => {
                 required
                 value={quantity}
                 onChange={(e) => {
-                  setQuantity(Math.max(1, Number(e.target.value)));
+                  const val = e.target.value;
+                  setQuantity(val);
                   setFormError(null);
                 }}
+                onBlur={() => {
+                  if (quantity === "" || Number(quantity) <= 0) {
+                    setQuantity(1);
+                  }
+                }}
+                placeholder="Enter units (e.g. 5)"
                 className={`w-full p-2.5 bg-[#18181C] border rounded-xl text-white font-mono text-sm focus:outline-none ${
                   isStockInsufficient ? "border-apple-red bg-apple-red/5" : "border-[#28282D] focus:border-apple-blue-bright"
                 }`}
@@ -230,9 +245,9 @@ export const SalesPage: React.FC = () => {
             {/* Submit */}
             <button
               type="submit"
-              disabled={submitting || isStockInsufficient || (selectedProduct?.current_stock === 0)}
+              disabled={submitting || isStockInsufficient || (numQty <= 0) || (selectedProduct?.current_stock === 0)}
               className={`w-full py-3 rounded-full text-xs font-semibold flex items-center justify-center space-x-2 transition-all ${
-                isStockInsufficient || (selectedProduct?.current_stock === 0)
+                isStockInsufficient || (numQty <= 0) || (selectedProduct?.current_stock === 0)
                   ? "opacity-40 cursor-not-allowed bg-apple-surface text-apple-text-tertiary"
                   : "apple-btn-primary shadow-glow-blue"
               }`}
