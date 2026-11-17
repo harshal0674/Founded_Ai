@@ -138,9 +138,9 @@ async def seed_database(clear_existing: bool = True) -> Dict[str, int]:
         await movements_col.delete_many({})
 
     # Check if already seeded
-    existing_count = await prod_col.count_documents()
+    existing_count = await prod_col.count_documents({})
     if existing_count > 0 and not clear_existing:
-        return {"products": existing_count, "sales": await sales_col.count_documents()}
+        return {"products": existing_count, "sales": await sales_col.count_documents({})}
 
     now = datetime.now(timezone.utc)
     seeded_products = []

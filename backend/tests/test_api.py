@@ -1,17 +1,21 @@
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
+from backend.app.config import settings
 from backend.app.main import app
 from backend.app.database import db_manager
 from backend.app.utils.seed_data import seed_database
 
 @pytest_asyncio.fixture(autouse=True)
 async def setup_test_db():
-    # Initialize connection and seed baseline data
+    # Force isolated in-memory test database for test runs
+    orig_uri = settings.MONGODB_URI
+    settings.MONGODB_URI = ""
     await db_manager.connect()
     await seed_database(clear_existing=True)
     yield
     await db_manager.close()
+    settings.MONGODB_URI = orig_uri
 
 @pytest.mark.asyncio
 async def test_health():

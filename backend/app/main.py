@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
     settings_col = db_manager.get_collection("system_settings")
     mode_doc = await settings_col.find_one({"key": "catalog_mode"})
     prod_col = db_manager.get_collection("products")
-    existing_count = await prod_col.count_documents()
+    existing_count = await prod_col.count_documents({})
     
     if existing_count == 0 and (not mode_doc or mode_doc.get("mode") != "custom"):
         logger.info("Initializing baseline demo dataset for demonstration...")

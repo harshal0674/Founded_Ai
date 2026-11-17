@@ -1,5 +1,15 @@
 import os
+from pathlib import Path
 from typing import List
+from dotenv import load_dotenv
+
+# Automatically load environment variables from .env files
+_root_env = Path(__file__).resolve().parent.parent.parent / ".env"
+_backend_env = Path(__file__).resolve().parent.parent / ".env"
+if _root_env.exists():
+    load_dotenv(_root_env)
+if _backend_env.exists():
+    load_dotenv(_backend_env)
 
 class Settings:
     PROJECT_NAME: str = "StockMind AI"
