@@ -133,8 +133,8 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
               onClick={() => navigate("/")}
               className="text-left group flex items-center space-x-2.5 focus:outline-none"
             >
-              <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-apple-blue to-apple-blue-bright flex items-center justify-center text-white font-bold text-xs shadow-glow-blue-subtle">
-                SM
+              <div className="w-8 h-8 rounded-xl bg-[#141418] border border-apple-border/80 overflow-hidden flex items-center justify-center shadow-glow-blue-subtle shrink-0 group-hover:border-apple-blue/50 transition-colors">
+                <img src="/logo.jpg" alt="StockMind Logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <span className="font-semibold text-white text-sm tracking-tight group-hover:text-apple-blue-bright transition-colors block leading-tight">
@@ -240,8 +240,8 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
         <header className="md:hidden h-14 px-4 border-b border-[#1D1D20] bg-[#0A0A0C] flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
             <button onClick={() => navigate("/")} className="flex items-center space-x-2">
-              <div className="w-6 h-6 rounded-lg bg-apple-blue flex items-center justify-center text-white font-semibold text-xs">
-                SM
+              <div className="w-7 h-7 rounded-lg bg-[#141418] border border-apple-border/80 overflow-hidden flex items-center justify-center shrink-0">
+                <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
               </div>
             </button>
             <div className="flex items-center space-x-1.5">

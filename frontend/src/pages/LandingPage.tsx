@@ -65,8 +65,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
             onClick={() => navigate("/")}
             className="flex items-center space-x-2.5 text-left focus:outline-none group"
           >
-            <div className="w-5 h-5 rounded-full bg-apple-blue flex items-center justify-center text-white text-[10px] font-semibold tracking-tighter shadow-glow-blue-subtle">
-              SM
+            <div className="w-6 h-6 rounded-lg bg-[#141418] border border-apple-border/80 overflow-hidden flex items-center justify-center shrink-0 shadow-glow-blue-subtle group-hover:border-apple-blue/50 transition-colors">
+              <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <span className="font-semibold text-sm tracking-tight text-apple-text group-hover:text-white transition-colors">
               StockMind AI
@@ -715,8 +715,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
       <footer className="py-12 px-6 md:px-12 bg-[#0A0A0C]/90 text-xs text-apple-text-secondary border-t border-apple-border/80 relative z-10">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center space-x-3 text-apple-text">
-            <div className="w-4 h-4 rounded-full bg-apple-blue flex items-center justify-center text-[8px] text-white font-bold">
-              SM
+            <div className="w-5 h-5 rounded-lg bg-[#141418] border border-apple-border/80 overflow-hidden flex items-center justify-center shrink-0">
+              <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <span className="font-semibold">StockMind AI</span>
             <span className="text-apple-border-light">|</span>
