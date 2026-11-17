@@ -156,3 +156,13 @@ export interface DashboardCharts {
     revenue: number;
   }>;
 }
+
+export interface OrganizationProfile {
+  name: string;
+  currency: string;
+  currency_symbol: string;
+  industry?: string;
+  gstin?: string;
+  address?: string;
+  phone?: string;
+}

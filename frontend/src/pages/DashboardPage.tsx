@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {
   TrendingUp,
-  DollarSign,
   AlertTriangle,
   ArrowUpRight,
   ShieldAlert,
   Plus,
   ShoppingCart,
   RefreshCw,
+  Building2,
   Boxes
 } from "lucide-react";
 import {
@@ -22,6 +22,7 @@ import {
   Bar
 } from "recharts";
 import { api } from "../api/client";
+import { useOrganization } from "../context/OrganizationContext";
 import { DashboardCharts, DashboardStats } from "../types";
 
 interface DashboardPageProps {
@@ -29,6 +30,7 @@ interface DashboardPageProps {
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
+  const { organization, formatCurrency, currencySymbol } = useOrganization();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [charts, setCharts] = useState<DashboardCharts | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,11 +65,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#1D1D20]">
         <div>
+          <div className="flex items-center space-x-2 text-apple-blue-bright text-xs font-mono mb-1">
+            <Building2 className="w-3.5 h-3.5" />
+            <span>{organization.name}</span>
+            <span>•</span>
+            <span>Default Currency: {currencySymbol} {organization.currency}</span>
+          </div>
           <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
-            Executive Command
+            Executive Command Center
           </h1>
           <p className="text-xs md:text-sm text-apple-text-secondary mt-1">
-            Real-time stock valuation, ML demand velocity, and automated replenishment status.
+            Real-time stock valuation, demand velocity, and automated replenishment in {currencySymbol} {organization.currency}.
           </p>
         </div>
 
@@ -82,7 +90,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
           </button>
           <button
             onClick={() => navigate("/inventory")}
-            className="apple-btn-primary text-xs py-2 px-4 flex items-center space-x-1.5"
+            className="apple-btn-primary text-xs py-2 px-4 flex items-center space-x-1.5 shadow-glow-blue-subtle"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Product</span>
@@ -111,10 +119,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
         <div className="apple-card p-5 md:p-6 space-y-2">
           <div className="flex items-center justify-between text-xs text-apple-text-secondary font-medium">
             <span>Total Stock Value</span>
-            <DollarSign className="w-4 h-4 text-apple-blue-bright" />
+            <span className="font-mono text-apple-blue-bright font-bold">{currencySymbol}</span>
           </div>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-            ${stats ? stats.total_stock_value.toLocaleString(undefined, { minimumFractionDigits: 2 }) : "0.00"}
+          <div className="text-2xl md:text-3xl font-bold tracking-tight text-white font-mono">
+            {stats ? formatCurrency(stats.total_stock_value) : formatCurrency(0)}
           </div>
           <div className="text-xs text-apple-text-secondary font-mono">
             {stats?.total_products || 0} active catalog SKUs
@@ -127,8 +135,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
             <span>30-Day Revenue</span>
             <TrendingUp className="w-4 h-4 text-apple-green" />
           </div>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-            ${stats ? stats.total_revenue_30d.toLocaleString(undefined, { minimumFractionDigits: 2 }) : "0.00"}
+          <div className="text-2xl md:text-3xl font-bold tracking-tight text-white font-mono">
+            {stats ? formatCurrency(stats.total_revenue_30d) : formatCurrency(0)}
           </div>
           <div className="text-xs text-apple-text-secondary font-mono">
             {stats?.total_units_sold_30d || 0} units dispatched
@@ -144,7 +152,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
             <span>Stockout Risks</span>
             <AlertTriangle className="w-4 h-4 text-apple-red" />
           </div>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-red">
+          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-red font-mono">
             {stats?.stockout_risk_count ?? 0}
           </div>
           <div className="text-xs text-apple-red flex items-center space-x-1">
@@ -162,7 +170,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
             <span>Reorders Triggered</span>
             <ShieldAlert className="w-4 h-4 text-apple-blue-bright" />
           </div>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-blue-bright">
+          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-blue-bright font-mono">
             {stats?.reorder_pending_count ?? 0}
           </div>
           <div className="text-xs text-apple-text-secondary font-mono">
@@ -173,26 +181,26 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
 
       {/* Main Visualizations: Demand Velocity & Stock Health */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* 30-Day Sales Velocity (Recharts with sleek dark styling) */}
+        {/* 30-Day Sales Velocity */}
         <div className="lg:col-span-8 apple-card p-6 md:p-7 space-y-5">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-semibold text-white tracking-tight">
-                30-Day Demand Velocity & Revenue
+                30-Day Demand Velocity & Revenue ({currencySymbol})
               </h3>
               <p className="text-xs text-apple-text-secondary mt-0.5">
-                Aggregated daily transactions across all sales channels
+                Aggregated daily sales transactions for {organization.name}
               </p>
             </div>
             <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-[#18181B] border border-apple-border text-apple-text-secondary">
-              Daily
+              {currencySymbol} {organization.currency}
             </span>
           </div>
 
           <div className="h-64 w-full">
             {charts?.sales_trend && charts.sales_trend.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={charts.sales_trend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={charts.sales_trend} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                   <defs>
                     <linearGradient id="appleBlueGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#0A84FF" stopOpacity={0.3} />
@@ -211,6 +219,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
                     tick={{ fontSize: 10, fill: "#86868B" }}
                     axisLine={false}
                     tickLine={false}
+                    tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`}
                   />
                   <Tooltip
                     contentStyle={{
@@ -223,7 +232,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
                       boxShadow: "0 8px 30px rgba(0,0,0,0.7)"
                     }}
                     formatter={(val: any, name: any) => [
-                      String(name) === "revenue" ? `$${Number(val).toFixed(2)}` : `${val} units`,
+                      String(name) === "revenue" ? formatCurrency(Number(val)) : `${val} units`,
                       String(name) === "revenue" ? "Revenue" : "Units Sold"
                     ]}
                   />
@@ -239,7 +248,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
               </ResponsiveContainer>
             ) : (
               <div className="h-full flex items-center justify-center text-xs text-apple-text-secondary font-mono">
-                {loading ? "Aggregating sales series..." : "No sales data found."}
+                {loading ? "Aggregating sales series..." : "No sales data recorded yet."}
               </div>
             )}
           </div>
@@ -341,7 +350,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
             <h3 className="text-base font-semibold text-white tracking-tight">
               Capital Valuation by Category
             </h3>
-            <span className="text-xs text-apple-text-secondary font-mono">USD ($)</span>
+            <span className="text-xs text-apple-text-secondary font-mono">{organization.currency} ({currencySymbol})</span>
           </div>
 
           <div className="h-56 w-full">
@@ -349,7 +358,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={charts.category_distribution} layout="vertical" margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#1D1D22" />
-                  <XAxis type="number" tick={{ fontSize: 10, fill: "#86868B" }} tickFormatter={(v) => `$${v}`} />
+                  <XAxis
+                    type="number"
+                    tick={{ fontSize: 10, fill: "#86868B" }}
+                    tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`}
+                  />
                   <YAxis type="category" dataKey="category" tick={{ fontSize: 10, fill: "#F5F5F7" }} width={100} />
                   <Tooltip
                     contentStyle={{
@@ -360,7 +373,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
                       fontSize: "11px",
                       fontFamily: "Inter, sans-serif"
                     }}
-                    formatter={(val: any) => [`$${Number(val).toFixed(2)}`, "Capital Allocated"]}
+                    formatter={(val: any) => [formatCurrency(Number(val)), "Capital Allocated"]}
                   />
                   <Bar dataKey="value" fill="#0A84FF" radius={[0, 6, 6, 0]} />
                 </BarChart>
@@ -379,7 +392,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
             <h3 className="text-base font-semibold text-white tracking-tight">
               Top Selling Products
             </h3>
-            <span className="text-xs text-apple-text-secondary font-mono">By Revenue</span>
+            <span className="text-xs text-apple-text-secondary font-mono">By Revenue ({currencySymbol})</span>
           </div>
 
           <div className="overflow-x-auto">
@@ -402,7 +415,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
                         {p.quantity.toLocaleString()}
                       </td>
                       <td className="py-3 text-right font-mono font-medium text-white">
-                        ${p.revenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        {formatCurrency(p.revenue)}
                       </td>
                     </tr>
                   ))

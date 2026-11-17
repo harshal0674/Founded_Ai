@@ -3,7 +3,9 @@ import {
   RefreshCw,
   Cpu,
   Info,
-  AlertCircle
+  AlertCircle,
+  Building2,
+  PackagePlus
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -16,9 +18,11 @@ import {
   CartesianGrid
 } from "recharts";
 import { api } from "../api/client";
+import { useOrganization } from "../context/OrganizationContext";
 import { Product, ProductForecast } from "../types";
 
 export const ForecastingPage: React.FC = () => {
+  const { organization, formatCurrency, currencySymbol } = useOrganization();
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [horizonDays, setHorizonDays] = useState<number>(30);
@@ -89,6 +93,12 @@ export const ForecastingPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#1D1D20]">
         <div>
+          <div className="flex items-center space-x-2 text-apple-blue-bright text-xs font-mono mb-1">
+            <Building2 className="w-3.5 h-3.5" />
+            <span>{organization.name}</span>
+            <span>•</span>
+            <span>Predictive Demand ({currencySymbol} {organization.currency})</span>
+          </div>
           <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
             Demand Forecasting Intelligence
           </h1>
@@ -99,12 +109,24 @@ export const ForecastingPage: React.FC = () => {
 
         <button
           onClick={() => fetchForecast(selectedProductId, horizonDays)}
-          className="apple-btn-secondary text-xs py-2 px-3.5 flex items-center space-x-1.5 self-start sm:self-auto"
+          disabled={!selectedProductId}
+          className="apple-btn-secondary text-xs py-2 px-3.5 flex items-center space-x-1.5 self-start sm:self-auto disabled:opacity-40"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-apple-blue-bright" : ""}`} />
           <span>Retrain & Recalibrate</span>
         </button>
       </div>
+
+      {/* Empty State if no products exist */}
+      {products.length === 0 && (
+        <div className="apple-card p-10 text-center space-y-4">
+          <PackagePlus className="w-8 h-8 text-apple-blue-bright mx-auto" />
+          <h3 className="text-base font-semibold text-white">No Catalog Products Available</h3>
+          <p className="text-xs text-apple-text-secondary max-w-md mx-auto">
+            Please add products to your inventory catalog in the Inventory tab to train the demand forecasting models.
+          </p>
+        </div>
+      )}
 
       {/* Control Selector Bar */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 apple-card p-4 items-center">

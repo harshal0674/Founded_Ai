@@ -158,3 +158,58 @@ async def test_dashboard_stats_and_charts():
         assert "sales_trend" in charts
         assert "category_distribution" in charts
         assert "stock_health" in charts
+
+@pytest.mark.asyncio
+async def test_organization_and_catalog_wipe():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        # 1. Fetch organization default
+        org_res = await client.get("/api/system/organization")
+        assert org_res.status_code == 200
+        org_data = org_res.json()
+        assert "name" in org_data
+        assert org_data["currency"] == "INR"
+        assert org_data["currency_symbol"] == "₹"
+
+        # 2. Update organization
+        update_res = await client.put("/api/system/organization", json={
+            "name": "Tata Consumer Logistics",
+            "currency": "INR",
+            "currency_symbol": "₹",
+            "industry": "Consumer Retail & FMCG",
+            "gstin": "27AABCT3518Q1Z1",
+            "address": "Mumbai, Maharashtra"
+        })
+        assert update_res.status_code == 200
+        assert update_res.json()["name"] == "Tata Consumer Logistics"
+
+        # 3. Verify get reflects updated org
+        org_res2 = await client.get("/api/system/organization")
+        assert org_res2.json()["name"] == "Tata Consumer Logistics"
+
+        # 4. Test Clear Catalog
+        clear_res = await client.post("/api/system/clear-catalog")
+        assert clear_res.status_code == 200
+        assert clear_res.json()["success"] is True
+
+        # Verify catalog is empty
+        p_res = await client.get("/api/products")
+        assert p_res.status_code == 200
+        assert len(p_res.json()) == 0
+
+        # Verify user can add their own product into empty catalog
+        my_product = {
+            "name": "Organic Basmati Rice (5kg)",
+            "sku": "FMCG-RICE-05",
+            "category": "Groceries & FMCG",
+            "current_stock": 80,
+            "min_stock_level": 20,
+            "unit_cost": 450.00,
+            "selling_price": 699.00,
+            "lead_time_days": 3,
+            "supplier_name": "Punjab Agro Direct",
+            "supplier_email": "supply@punjabagro.example"
+        }
+        create_res = await client.post("/api/products", json=my_product)
+        assert create_res.status_code == 201
+        assert create_res.json()["name"] == "Organic Basmati Rice (5kg)"
+        assert create_res.json()["selling_price"] == 699.00

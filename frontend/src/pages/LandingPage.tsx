@@ -328,7 +328,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
                   </div>
 
                   <div>
-                    <div className="text-3xl font-bold tracking-tight text-white font-mono">$43,770</div>
+                    <div className="text-3xl font-bold tracking-tight text-white font-mono">₹36,45,000</div>
                     <div className="text-xs text-apple-text-secondary mt-0.5">30-day gross throughput</div>
                   </div>
 
@@ -671,7 +671,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
 
             <div className="apple-card p-6 space-y-2">
               <span className="text-xs text-apple-text-secondary font-mono">Gross Throughput</span>
-              <div className="text-3xl sm:text-4xl font-bold text-white tracking-tight font-mono">$43.7K</div>
+              <div className="text-3xl sm:text-4xl font-bold text-white tracking-tight font-mono">₹36.5L</div>
               <span className="text-xs text-apple-text-secondary">Past 30 days</span>
             </div>
 

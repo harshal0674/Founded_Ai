@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Building2 } from "lucide-react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -14,9 +14,11 @@ import {
   Legend
 } from "recharts";
 import { api } from "../api/client";
+import { useOrganization } from "../context/OrganizationContext";
 import { DashboardCharts, DashboardStats, Product, Sale } from "../types";
 
 export const AnalyticsPage: React.FC = () => {
+  const { organization, formatCurrency, currencySymbol } = useOrganization();
   const [charts, setCharts] = useState<DashboardCharts | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [sales, setSales] = useState<Sale[]>([]);
@@ -61,6 +63,12 @@ export const AnalyticsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#1D1D20]">
         <div>
+          <div className="flex items-center space-x-2 text-apple-blue-bright text-xs font-mono mb-1">
+            <Building2 className="w-3.5 h-3.5" />
+            <span>{organization.name}</span>
+            <span>•</span>
+            <span>Portfolio Valuation ({currencySymbol} {organization.currency})</span>
+          </div>
           <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
             Inventory & Channel Analytics
           </h1>
@@ -82,16 +90,16 @@ export const AnalyticsPage: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="apple-card p-5 space-y-1">
           <span className="text-[11px] font-mono text-apple-text-secondary">Balance Sheet Valuation</span>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-            ${stats?.total_stock_value.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "0.00"}
+          <div className="text-2xl md:text-3xl font-bold tracking-tight text-white font-mono">
+            {stats ? formatCurrency(stats.total_stock_value) : formatCurrency(0)}
           </div>
           <p className="text-[10px] text-apple-text-secondary font-mono">Current capital tied in inventory</p>
         </div>
 
         <div className="apple-card p-5 space-y-1">
           <span className="text-[11px] font-mono text-apple-text-secondary">30-Day Revenue</span>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-            ${stats?.total_revenue_30d.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "0.00"}
+          <div className="text-2xl md:text-3xl font-bold tracking-tight text-white font-mono">
+            {stats ? formatCurrency(stats.total_revenue_30d) : formatCurrency(0)}
           </div>
           <p className="text-[10px] text-apple-text-secondary font-mono">Gross channel throughput</p>
         </div>
@@ -132,7 +140,10 @@ export const AnalyticsPage: React.FC = () => {
                 <BarChart data={charts.category_distribution} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1D1D22" />
                   <XAxis dataKey="category" tick={{ fontSize: 10, fill: "#86868B" }} axisLine={{ stroke: "#232327" }} />
-                  <YAxis tick={{ fontSize: 10, fill: "#86868B" }} tickFormatter={(v) => `$${v}`} />
+                  <YAxis
+                    tick={{ fontSize: 10, fill: "#86868B" }}
+                    tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#161618",
@@ -142,7 +153,7 @@ export const AnalyticsPage: React.FC = () => {
                       fontSize: "11px",
                       fontFamily: "Inter, sans-serif"
                     }}
-                    formatter={(val: any) => [`$${Number(val).toFixed(2)}`, "Stock Value"]}
+                    formatter={(val: any) => [formatCurrency(Number(val)), "Stock Value"]}
                   />
                   <Bar dataKey="value" fill="#0A84FF" radius={[6, 6, 0, 0]} />
                 </BarChart>
@@ -191,7 +202,7 @@ export const AnalyticsPage: React.FC = () => {
                       fontSize: "11px",
                       fontFamily: "Inter, sans-serif"
                     }}
-                    formatter={(v: any) => [`$${Number(v).toLocaleString()}`, "Revenue"]}
+                    formatter={(v: any) => [formatCurrency(Number(v)), "Revenue"]}
                   />
                   <Legend wrapperStyle={{ fontSize: "11px", fontFamily: "Inter, sans-serif" }} />
                 </PieChart>

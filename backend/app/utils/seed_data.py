@@ -10,11 +10,11 @@ DEMO_PRODUCTS = [
         "category": "Industrial Sensors",
         "current_stock": 14,
         "min_stock_level": 40,
-        "unit_cost": 4.20,
-        "selling_price": 9.80,
+        "unit_cost": 350.00,
+        "selling_price": 799.00,
         "lead_time_days": 10,
-        "supplier_name": "Nordic Microtech AB",
-        "supplier_email": "orders@nordicmicro.example"
+        "supplier_name": "Apex Sensors India (Pune)",
+        "supplier_email": "orders@apexsensors.example"
     },
     {
         "name": "Mechanical Keyboard Tactile Switch (110-Pack)",
@@ -22,11 +22,11 @@ DEMO_PRODUCTS = [
         "category": "Computer Hardware",
         "current_stock": 65,
         "min_stock_level": 30,
-        "unit_cost": 22.00,
-        "selling_price": 48.50,
+        "unit_cost": 1850.00,
+        "selling_price": 3999.00,
         "lead_time_days": 7,
-        "supplier_name": "Apex Precision Switches",
-        "supplier_email": "supply@apexprecision.example"
+        "supplier_name": "Precision Switches (Bengaluru)",
+        "supplier_email": "supply@precisionswitches.example"
     },
     {
         "name": "Braided USB-C to C 240W Cable (2m)",
@@ -34,11 +34,11 @@ DEMO_PRODUCTS = [
         "category": "Electronics",
         "current_stock": 180,
         "min_stock_level": 50,
-        "unit_cost": 3.10,
-        "selling_price": 14.99,
+        "unit_cost": 250.00,
+        "selling_price": 899.00,
         "lead_time_days": 5,
-        "supplier_name": "Shenzhen LinkTech Direct",
-        "supplier_email": "export@linktech-sz.example"
+        "supplier_name": "LinkTech Electronics (Mumbai)",
+        "supplier_email": "export@linktech-in.example"
     },
     {
         "name": "Thermal Label Rolls 4x6 (Case of 6)",
@@ -46,10 +46,10 @@ DEMO_PRODUCTS = [
         "category": "Packaging",
         "current_stock": 6,
         "min_stock_level": 25,
-        "unit_cost": 18.50,
-        "selling_price": 38.00,
+        "unit_cost": 650.00,
+        "selling_price": 1499.00,
         "lead_time_days": 4,
-        "supplier_name": "Avery Logistics Supply",
+        "supplier_name": "Avery Logistics Supply (Delhi)",
         "supplier_email": "sales@averylogistics.example"
     },
     {
@@ -58,10 +58,10 @@ DEMO_PRODUCTS = [
         "category": "Industrial Sensors",
         "current_stock": 0,
         "min_stock_level": 15,
-        "unit_cost": 16.00,
-        "selling_price": 34.50,
+        "unit_cost": 1200.00,
+        "selling_price": 2499.00,
         "lead_time_days": 12,
-        "supplier_name": "SafeStatic Industries",
+        "supplier_name": "SafeStatic Enterprises (Chennai)",
         "supplier_email": "repairs@safestatic.example"
     },
     {
@@ -70,10 +70,10 @@ DEMO_PRODUCTS = [
         "category": "Computer Hardware",
         "current_stock": 42,
         "min_stock_level": 20,
-        "unit_cost": 15.00,
-        "selling_price": 39.99,
+        "unit_cost": 1450.00,
+        "selling_price": 2999.00,
         "lead_time_days": 8,
-        "supplier_name": "LogiLine Devices",
+        "supplier_name": "LogiLine Devices India",
         "supplier_email": "procurement@logiline.example"
     },
     {
@@ -82,10 +82,10 @@ DEMO_PRODUCTS = [
         "category": "Packaging",
         "current_stock": 85,
         "min_stock_level": 30,
-        "unit_cost": 4.50,
-        "selling_price": 11.20,
+        "unit_cost": 220.00,
+        "selling_price": 549.00,
         "lead_time_days": 3,
-        "supplier_name": "EcoPack Solutions",
+        "supplier_name": "EcoPack Packaging (Ahmedabad)",
         "supplier_email": "b2b@ecopack.example"
     },
     {
@@ -94,11 +94,11 @@ DEMO_PRODUCTS = [
         "category": "Electronics",
         "current_stock": 8,
         "min_stock_level": 35,
-        "unit_cost": 9.50,
-        "selling_price": 28.00,
+        "unit_cost": 850.00,
+        "selling_price": 2199.00,
         "lead_time_days": 9,
-        "supplier_name": "Shenzhen LinkTech Direct",
-        "supplier_email": "export@linktech-sz.example"
+        "supplier_name": "LinkTech Electronics (Mumbai)",
+        "supplier_email": "export@linktech-in.example"
     },
     {
         "name": "Adjustable Aluminum Monitor Arm",
@@ -106,10 +106,10 @@ DEMO_PRODUCTS = [
         "category": "Office Tech",
         "current_stock": 28,
         "min_stock_level": 15,
-        "unit_cost": 32.00,
-        "selling_price": 79.00,
+        "unit_cost": 2800.00,
+        "selling_price": 5999.00,
         "lead_time_days": 14,
-        "supplier_name": "ErgoWorkspace Ltd",
+        "supplier_name": "ErgoWorkspace India (Hyderabad)",
         "supplier_email": "sales@ergoworkspace.example"
     },
     {
@@ -118,10 +118,10 @@ DEMO_PRODUCTS = [
         "category": "Packaging",
         "current_stock": 45,
         "min_stock_level": 20,
-        "unit_cost": 11.00,
-        "selling_price": 24.50,
+        "unit_cost": 450.00,
+        "selling_price": 999.00,
         "lead_time_days": 4,
-        "supplier_name": "EcoPack Solutions",
+        "supplier_name": "EcoPack Packaging (Ahmedabad)",
         "supplier_email": "b2b@ecopack.example"
     }
 ]

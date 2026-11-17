@@ -6,12 +6,17 @@ import {
   Trash2,
   RefreshCw,
   PackagePlus,
-  X
+  X,
+  Sparkles,
+  Building2,
+  ArrowRight
 } from "lucide-react";
 import { api } from "../api/client";
+import { useOrganization } from "../context/OrganizationContext";
 import { Product, ProductCreate } from "../types";
 
 export const InventoryPage: React.FC = () => {
+  const { organization, formatCurrency, currencySymbol, clearCatalog, reloadDemoData } = useOrganization();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,14 +40,14 @@ export const InventoryPage: React.FC = () => {
   const [formData, setFormData] = useState<ProductCreate>({
     name: "",
     sku: "",
-    category: "Electronics",
+    category: "Retail & FMCG",
     current_stock: 50,
-    min_stock_level: 20,
-    unit_cost: 5.0,
-    selling_price: 12.0,
-    lead_time_days: 7,
-    supplier_name: "Direct Global Supply",
-    supplier_email: "orders@globalsupply.example"
+    min_stock_level: 15,
+    unit_cost: 250.0,
+    selling_price: 499.0,
+    lead_time_days: 5,
+    supplier_name: "Direct Wholesale Supply",
+    supplier_email: "orders@wholesalepartner.example"
   });
 
   const loadProducts = async () => {
@@ -64,7 +69,16 @@ export const InventoryPage: React.FC = () => {
 
   useEffect(() => {
     loadProducts();
+    const handleRefresh = () => loadProducts();
+    window.addEventListener("stockmind:refresh", handleRefresh);
+    return () => window.removeEventListener("stockmind:refresh", handleRefresh);
   }, [search, selectedCategory, selectedStatus]);
+
+  const generateAutoSku = () => {
+    const prefix = formData.category.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, "SKU");
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    setFormData((prev) => ({ ...prev, sku: `${prefix}-${rand}` }));
+  };
 
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,6 +141,27 @@ export const InventoryPage: React.FC = () => {
     }
   };
 
+  const handleClearCatalog = async () => {
+    if (!window.confirm("Wipe all existing products and start with a completely empty catalog for your organization?")) {
+      return;
+    }
+    try {
+      await clearCatalog();
+      loadProducts();
+    } catch (err: any) {
+      alert(`Failed to clear catalog: ${err.message}`);
+    }
+  };
+
+  const handleSeedDemo = async () => {
+    try {
+      await reloadDemoData();
+      loadProducts();
+    } catch (err: any) {
+      alert(`Failed to seed demo: ${err.message}`);
+    }
+  };
+
   const openEditModal = (p: Product) => {
     setActiveProduct(p);
     setFormData({
@@ -154,44 +189,80 @@ export const InventoryPage: React.FC = () => {
   const resetForm = () => {
     setFormData({
       name: "",
-      sku: "",
-      category: "Electronics",
+      sku: `SKU-IN-${Math.floor(1000 + Math.random() * 9000)}`,
+      category: "Retail & FMCG",
       current_stock: 50,
-      min_stock_level: 20,
-      unit_cost: 5.0,
-      selling_price: 12.0,
-      lead_time_days: 7,
-      supplier_name: "Direct Global Supply",
-      supplier_email: "orders@globalsupply.example"
+      min_stock_level: 15,
+      unit_cost: 250.0,
+      selling_price: 499.0,
+      lead_time_days: 5,
+      supplier_name: "Direct Wholesale Supply",
+      supplier_email: "orders@wholesalepartner.example"
     });
     setFormError(null);
   };
 
-  const categories = ["all", "Industrial Sensors", "Computer Hardware", "Electronics", "Packaging", "Office Tech"];
+  const defaultCategories = [
+    "Retail & FMCG",
+    "Groceries & Daily Essentials",
+    "Electronics & Gadgets",
+    "Computer Hardware",
+    "Apparel & Fashion",
+    "Industrial Sensors",
+    "Packaging",
+    "Office Tech",
+    "Health & Personal Care",
+    "Home & Kitchen"
+  ];
+
+  // Derive unique categories from active products + defaults
+  const availableCategories = Array.from(new Set([
+    ...defaultCategories,
+    ...products.map((p) => p.category).filter(Boolean)
+  ]));
 
   return (
     <div className="p-6 md:p-10 space-y-6 max-w-7xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#1D1D20]">
         <div>
+          <div className="flex items-center space-x-2 text-apple-blue-bright text-xs font-mono mb-1">
+            <Building2 className="w-3.5 h-3.5" />
+            <span>{organization.name}</span>
+            <span>•</span>
+            <span>Currency: {currencySymbol} {organization.currency}</span>
+          </div>
           <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
-            Inventory Catalog
+            Inventory & SKU Catalog
           </h1>
           <p className="text-xs md:text-sm text-apple-text-secondary mt-1">
-            Complete SKU lifecycle, on-hand thresholds, valuation, and supplier lead times.
+            Manage your store's inventory, stock thresholds, unit costs ({currencySymbol}), and supplier parameters.
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            resetForm();
-            setIsAddModalOpen(true);
-          }}
-          className="apple-btn-primary text-xs py-2 px-4 flex items-center space-x-1.5 self-start sm:self-auto"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Add Product</span>
-        </button>
+        <div className="flex items-center space-x-2.5 self-start sm:self-auto">
+          {products.length > 0 && (
+            <button
+              onClick={handleClearCatalog}
+              title="Clear all demo products so you can enter your own catalog from scratch"
+              className="apple-btn-secondary text-xs py-2 px-3 flex items-center space-x-1.5 text-apple-text-secondary hover:text-apple-red hover:border-apple-red/40"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Clear Catalog</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => {
+              resetForm();
+              setIsAddModalOpen(true);
+            }}
+            className="apple-btn-primary text-xs py-2 px-4 flex items-center space-x-1.5 shadow-glow-blue-subtle"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Product</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
@@ -201,7 +272,7 @@ export const InventoryPage: React.FC = () => {
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-apple-text-secondary" />
           <input
             type="text"
-            placeholder="Search by product name or SKU..."
+            placeholder="Search by product name, SKU, or supplier..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-3 py-2 text-xs bg-[#18181C] border border-[#26262B] rounded-xl text-white placeholder-apple-text-tertiary focus:outline-none focus:border-apple-blue-bright"
@@ -215,9 +286,10 @@ export const InventoryPage: React.FC = () => {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="w-full py-2 px-3 text-xs bg-[#18181C] border border-[#26262B] rounded-xl text-apple-text focus:outline-none focus:border-apple-blue-bright"
           >
-            {categories.map((c) => (
+            <option value="all">Category: All Categories</option>
+            {availableCategories.map((c) => (
               <option key={c} value={c}>
-                Category: {c === "all" ? "All Categories" : c}
+                {c}
               </option>
             ))}
           </select>
@@ -238,119 +310,158 @@ export const InventoryPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Product Table (Apple Clean Table) */}
-      <div className="apple-card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-[#151518] border-b border-[#232327] font-mono text-[11px] text-apple-text-secondary">
-              <tr>
-                <th className="py-3.5 px-5 font-medium">Product / SKU</th>
-                <th className="py-3.5 px-5 font-medium">Category</th>
-                <th className="py-3.5 px-5 font-medium text-right">On-Hand Stock</th>
-                <th className="py-3.5 px-5 font-medium text-right">Min Stock</th>
-                <th className="py-3.5 px-5 font-medium text-right">Unit Price</th>
-                <th className="py-3.5 px-5 font-medium text-right">Stock Valuation</th>
-                <th className="py-3.5 px-5 font-medium">Status</th>
-                <th className="py-3.5 px-5 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#1D1D22]">
-              {loading ? (
-                <tr>
-                  <td colSpan={8} className="py-12 text-center text-apple-text-secondary font-mono">
-                    <div className="flex items-center justify-center space-x-2">
-                      <RefreshCw className="w-4 h-4 animate-spin text-apple-blue-bright" />
-                      <span>Loading inventory catalog...</span>
-                    </div>
-                  </td>
-                </tr>
-              ) : products.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-12 text-center text-apple-text-secondary font-mono">
-                    No products found matching your search.
-                  </td>
-                </tr>
-              ) : (
-                products.map((p) => {
-                  let badge = (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-green/10 text-apple-green border border-apple-green/20">
-                      In Stock
-                    </span>
-                  );
-                  if (p.stock_status === "low_stock") {
-                    badge = (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-orange/10 text-apple-orange border border-apple-orange/20">
-                        Low Stock
-                      </span>
-                    );
-                  } else if (p.stock_status === "out_of_stock") {
-                    badge = (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-red/10 text-apple-red border border-apple-red/20 font-semibold">
-                        Stockout
-                      </span>
-                    );
-                  }
-
-                  return (
-                    <tr key={p.id} className="hover:bg-[#16161A] transition-colors">
-                      <td className="py-4 px-5">
-                        <div className="font-semibold text-white">{p.name}</div>
-                        <div className="font-mono text-[11px] text-apple-text-secondary">{p.sku}</div>
-                      </td>
-                      <td className="py-4 px-5 text-apple-text-secondary">{p.category}</td>
-                      <td className="py-4 px-5 text-right font-mono font-medium text-white">
-                        {p.current_stock.toLocaleString()}
-                      </td>
-                      <td className="py-4 px-5 text-right font-mono text-apple-text-secondary">
-                        {p.min_stock_level}
-                      </td>
-                      <td className="py-4 px-5 text-right font-mono text-white">
-                        ${p.selling_price.toFixed(2)}
-                      </td>
-                      <td className="py-4 px-5 text-right font-mono font-medium text-white">
-                        ${p.total_value.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                      </td>
-                      <td className="py-4 px-5">{badge}</td>
-                      <td className="py-4 px-5 text-right space-x-1.5 whitespace-nowrap">
-                        <button
-                          onClick={() => openRestockModal(p)}
-                          className="p-1.5 rounded-lg hover:bg-apple-blue/20 text-apple-blue-bright transition-colors"
-                          title="Quick Restock"
-                        >
-                          <PackagePlus className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => openEditModal(p)}
-                          className="p-1.5 rounded-lg hover:bg-[#25252A] text-apple-text-secondary hover:text-white transition-colors"
-                          title="Edit Product"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p.id, p.name)}
-                          className="p-1.5 rounded-lg hover:bg-apple-red/20 text-apple-red transition-colors"
-                          title="Delete Product"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+      {/* Empty State Banner when 0 products exist */}
+      {!loading && products.length === 0 && (
+        <div className="apple-card p-10 md:p-14 text-center space-y-5 border border-dashed border-apple-border/80">
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-apple-blue/10 border border-apple-blue/30 flex items-center justify-center text-apple-blue-bright">
+            <PackagePlus className="w-7 h-7" />
+          </div>
+          <div className="max-w-md mx-auto space-y-2">
+            <h3 className="text-lg font-semibold text-white">Your SKU Catalog is Empty</h3>
+            <p className="text-xs text-apple-text-secondary leading-relaxed">
+              Start adding the products for <strong className="text-white">{organization.name}</strong> to unlock automated stock deduction, ML demand forecasting, and reorder intelligence.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <button
+              onClick={() => {
+                resetForm();
+                setIsAddModalOpen(true);
+              }}
+              className="apple-btn-primary text-xs py-2.5 px-5 flex items-center space-x-2 shadow-glow-blue-subtle"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Your First Product</span>
+            </button>
+            <button
+              onClick={handleSeedDemo}
+              className="apple-btn-secondary text-xs py-2.5 px-4 flex items-center space-x-2 text-apple-text-secondary hover:text-white"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Load Sample Indian Retail SKUs</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Product Table (Apple Clean Table) */}
+      {(loading || products.length > 0) && (
+        <div className="apple-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-[#151518] border-b border-[#232327] font-mono text-[11px] text-apple-text-secondary">
+                <tr>
+                  <th className="py-3.5 px-5 font-medium">Product / SKU</th>
+                  <th className="py-3.5 px-5 font-medium">Category</th>
+                  <th className="py-3.5 px-5 font-medium text-right">On-Hand Stock</th>
+                  <th className="py-3.5 px-5 font-medium text-right">Min Stock</th>
+                  <th className="py-3.5 px-5 font-medium text-right">Unit Cost ({currencySymbol})</th>
+                  <th className="py-3.5 px-5 font-medium text-right">Selling Price ({currencySymbol})</th>
+                  <th className="py-3.5 px-5 font-medium text-right">Stock Valuation</th>
+                  <th className="py-3.5 px-5 font-medium">Status</th>
+                  <th className="py-3.5 px-5 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#1D1D22]">
+                {loading ? (
+                  <tr>
+                    <td colSpan={9} className="py-12 text-center text-apple-text-secondary font-mono">
+                      <div className="flex items-center justify-center space-x-2">
+                        <RefreshCw className="w-4 h-4 animate-spin text-apple-blue-bright" />
+                        <span>Loading inventory catalog for {organization.name}...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  products.map((p) => {
+                    let badge = (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-green/10 text-apple-green border border-apple-green/20">
+                        In Stock
+                      </span>
+                    );
+                    if (p.stock_status === "low_stock") {
+                      badge = (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-orange/10 text-apple-orange border border-apple-orange/20">
+                          Low Stock
+                        </span>
+                      );
+                    } else if (p.stock_status === "out_of_stock") {
+                      badge = (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-red/10 text-apple-red border border-apple-red/20 font-semibold">
+                          Stockout
+                        </span>
+                      );
+                    }
+
+                    return (
+                      <tr key={p.id} className="hover:bg-[#16161A] transition-colors">
+                        <td className="py-4 px-5">
+                          <div className="font-semibold text-white">{p.name}</div>
+                          <div className="font-mono text-[11px] text-apple-text-secondary">{p.sku}</div>
+                        </td>
+                        <td className="py-4 px-5 text-apple-text-secondary">{p.category}</td>
+                        <td className="py-4 px-5 text-right font-mono font-medium text-white">
+                          {p.current_stock.toLocaleString()}
+                        </td>
+                        <td className="py-4 px-5 text-right font-mono text-apple-text-secondary">
+                          {p.min_stock_level}
+                        </td>
+                        <td className="py-4 px-5 text-right font-mono text-apple-text-secondary">
+                          {formatCurrency(p.unit_cost)}
+                        </td>
+                        <td className="py-4 px-5 text-right font-mono text-white font-semibold">
+                          {formatCurrency(p.selling_price)}
+                        </td>
+                        <td className="py-4 px-5 text-right font-mono font-medium text-white">
+                          {formatCurrency(p.total_value)}
+                        </td>
+                        <td className="py-4 px-5">{badge}</td>
+                        <td className="py-4 px-5 text-right space-x-1.5 whitespace-nowrap">
+                          <button
+                            onClick={() => openRestockModal(p)}
+                            className="p-1.5 rounded-lg hover:bg-apple-blue/20 text-apple-blue-bright transition-colors"
+                            title="Quick Restock"
+                          >
+                            <PackagePlus className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => openEditModal(p)}
+                            className="p-1.5 rounded-lg hover:bg-[#25252A] text-apple-text-secondary hover:text-white transition-colors"
+                            title="Edit Product"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(p.id, p.name)}
+                            className="p-1.5 rounded-lg hover:bg-apple-red/20 text-apple-red transition-colors"
+                            title="Delete Product"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Add / Edit Modal */}
       {(isAddModalOpen || isEditModalOpen) && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-[#121214] rounded-2xl border border-[#28282D] w-full max-w-xl shadow-2xl p-6 md:p-8 space-y-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-[#232327]">
-              <h3 className="text-lg font-semibold text-white tracking-tight">
-                {isAddModalOpen ? "New Inventory SKU" : `Edit SKU: ${activeProduct?.sku}`}
-              </h3>
+              <div>
+                <h3 className="text-lg font-semibold text-white tracking-tight">
+                  {isAddModalOpen ? "Add New Product SKU" : `Edit SKU: ${activeProduct?.sku}`}
+                </h3>
+                <p className="text-[11px] text-apple-text-secondary">
+                  Organization: <strong className="text-white">{organization.name}</strong> · All prices in {currencySymbol} {organization.currency}
+                </p>
+              </div>
               <button
                 onClick={() => {
                   setIsAddModalOpen(false);
@@ -378,19 +489,29 @@ export const InventoryPage: React.FC = () => {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white focus:outline-none focus:border-apple-blue-bright"
-                    placeholder="e.g. Optical Sensor Module"
+                    placeholder="e.g. Basmati Rice 5kg, Boat Earbuds, Tata Tea 500g"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-apple-text-secondary font-medium mb-1">SKU Code *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-apple-text-secondary font-medium">SKU Identifier *</label>
+                    <button
+                      type="button"
+                      onClick={generateAutoSku}
+                      className="text-[10px] text-apple-blue-bright hover:underline flex items-center space-x-1"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>Auto-Generate</span>
+                    </button>
+                  </div>
                   <input
                     type="text"
                     required
                     value={formData.sku}
                     onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
                     className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
-                    placeholder="e.g. SEN-OPT-01"
+                    placeholder="e.g. SKU-IN-101"
                   />
                 </div>
 
@@ -401,11 +522,11 @@ export const InventoryPage: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white focus:outline-none focus:border-apple-blue-bright"
                   >
-                    <option value="Electronics">Electronics</option>
-                    <option value="Computer Hardware">Computer Hardware</option>
-                    <option value="Industrial Sensors">Industrial Sensors</option>
-                    <option value="Packaging">Packaging</option>
-                    <option value="Office Tech">Office Tech</option>
+                    {availableCategories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -422,7 +543,7 @@ export const InventoryPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-apple-text-secondary font-medium mb-1">Min Safety Threshold *</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">Min Alert Threshold *</label>
                   <input
                     type="number"
                     min="0"
@@ -434,7 +555,7 @@ export const InventoryPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-apple-text-secondary font-medium mb-1">Unit Cost ($) *</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">Unit Cost ({currencySymbol}) *</label>
                   <input
                     type="number"
                     step="0.01"
@@ -443,11 +564,12 @@ export const InventoryPage: React.FC = () => {
                     value={formData.unit_cost}
                     onChange={(e) => setFormData({ ...formData, unit_cost: Number(e.target.value) })}
                     className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
+                    placeholder="e.g. 250.00"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-apple-text-secondary font-medium mb-1">Selling Price ($) *</label>
+                  <label className="block text-apple-text-secondary font-medium mb-1">Selling Price ({currencySymbol}) *</label>
                   <input
                     type="number"
                     step="0.01"
@@ -456,6 +578,7 @@ export const InventoryPage: React.FC = () => {
                     value={formData.selling_price}
                     onChange={(e) => setFormData({ ...formData, selling_price: Number(e.target.value) })}
                     className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
+                    placeholder="e.g. 499.00"
                   />
                 </div>
 
@@ -477,6 +600,7 @@ export const InventoryPage: React.FC = () => {
                     type="text"
                     value={formData.supplier_name || ""}
                     onChange={(e) => setFormData({ ...formData, supplier_name: e.target.value })}
+                    placeholder="e.g. Direct Distributor / Reliance Wholesale"
                     className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white focus:outline-none focus:border-apple-blue-bright"
                   />
                 </div>
@@ -496,9 +620,9 @@ export const InventoryPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="apple-btn-primary text-xs py-2 px-5"
+                  className="apple-btn-primary text-xs py-2 px-5 shadow-glow-blue-subtle"
                 >
-                  {formLoading ? "Saving..." : isAddModalOpen ? "Create Product" : "Save Changes"}
+                  {formLoading ? "Saving..." : isAddModalOpen ? "Save & Create SKU" : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -508,12 +632,15 @@ export const InventoryPage: React.FC = () => {
 
       {/* Restock Modal */}
       {isRestockModalOpen && activeProduct && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-[#121214] rounded-2xl border border-[#28282D] w-full max-w-md shadow-2xl p-6 md:p-8 space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-[#232327]">
-              <h3 className="text-base font-semibold text-white tracking-tight">
-                Restock: {activeProduct.name}
-              </h3>
+              <div>
+                <h3 className="text-base font-semibold text-white tracking-tight">
+                  Restock: {activeProduct.name}
+                </h3>
+                <p className="text-[11px] text-apple-text-secondary font-mono">{activeProduct.sku}</p>
+              </div>
               <button onClick={() => setIsRestockModalOpen(false)} className="text-apple-text-secondary hover:text-white">
                 <X className="w-5 h-5" />
               </button>
@@ -527,7 +654,7 @@ export const InventoryPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-apple-text-secondary">Unit Cost:</span>
-                  <span className="text-white">${activeProduct.unit_cost.toFixed(2)}</span>
+                  <span className="text-white">{formatCurrency(activeProduct.unit_cost)}</span>
                 </div>
               </div>
 
@@ -546,7 +673,7 @@ export const InventoryPage: React.FC = () => {
               </div>
 
               <div className="text-[11px] font-mono text-apple-text-secondary">
-                Estimated Capital Outlay: ${(restockQty * activeProduct.unit_cost).toFixed(2)}
+                Estimated Capital Outlay: <strong className="text-white">{formatCurrency(restockQty * activeProduct.unit_cost)}</strong>
               </div>
 
               <div className="pt-3 border-t border-[#232327] flex items-center justify-end space-x-3">
@@ -560,7 +687,7 @@ export const InventoryPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="apple-btn-primary text-xs py-2 px-5"
+                  className="apple-btn-primary text-xs py-2 px-5 shadow-glow-blue-subtle"
                 >
                   {formLoading ? "Recording..." : "Confirm Inbound Stock"}
                 </button>

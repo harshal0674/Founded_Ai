@@ -6,13 +6,15 @@ import {
   PackagePlus,
   RefreshCw,
   Clock,
-  DollarSign,
-  Truck
+  Truck,
+  Building2
 } from "lucide-react";
 import { api } from "../api/client";
+import { useOrganization } from "../context/OrganizationContext";
 import { Recommendation, RecommendationOverview } from "../types";
 
 export const RecommendationsPage: React.FC = () => {
+  const { organization, formatCurrency, currencySymbol } = useOrganization();
   const [data, setData] = useState<RecommendationOverview | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +59,12 @@ export const RecommendationsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#1D1D20]">
         <div>
+          <div className="flex items-center space-x-2 text-apple-blue-bright text-xs font-mono mb-1">
+            <Building2 className="w-3.5 h-3.5" />
+            <span>{organization.name}</span>
+            <span>•</span>
+            <span>Replenishment Strategy ({currencySymbol} {organization.currency})</span>
+          </div>
           <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
             Intelligent Replenishment Optimization
           </h1>
@@ -128,10 +136,10 @@ export const RecommendationsPage: React.FC = () => {
           <div className="apple-card p-5 space-y-1">
             <div className="flex items-center justify-between text-apple-text-secondary text-xs font-mono">
               <span>REQUIRED CAPITAL</span>
-              <DollarSign className="w-4 h-4 text-apple-blue-bright" />
+              <span className="font-bold text-apple-blue-bright font-mono">{currencySymbol}</span>
             </div>
-            <div className="font-bold text-2xl text-apple-blue-bright mt-1">
-              ${data.total_capital_required.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            <div className="font-bold text-2xl text-apple-blue-bright mt-1 font-mono">
+              {formatCurrency(data.total_capital_required)}
             </div>
             <p className="text-[11px] text-apple-text-secondary font-mono">To satisfy reorder triggers</p>
           </div>
@@ -268,7 +276,7 @@ export const RecommendationsPage: React.FC = () => {
                     <span className="leading-relaxed">{rec.reasoning}</span>
                     {rec.action_required && (
                       <div className="pt-1.5 font-mono text-[11px] text-apple-text-secondary">
-                        Recommended PO: <strong className="text-white">{rec.suggested_order_qty} units</strong> · Estimated Capital Outlay: <strong className="text-white">${rec.estimated_cost.toFixed(2)}</strong>
+                        Recommended PO: <strong className="text-white">{rec.suggested_order_qty} units</strong> · Estimated Capital Outlay: <strong className="text-white">{formatCurrency(rec.estimated_cost)}</strong>
                       </div>
                     )}
                   </div>

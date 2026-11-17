@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { ShoppingCart, RefreshCw, AlertTriangle, CheckCircle2, User, Globe, Store } from "lucide-react";
+import { ShoppingCart, RefreshCw, AlertTriangle, CheckCircle2, User, Globe, Store, Building2 } from "lucide-react";
 import { api } from "../api/client";
+import { useOrganization } from "../context/OrganizationContext";
 import { Product, Sale, SaleCreate } from "../types";
 
 export const SalesPage: React.FC = () => {
+  const { organization, formatCurrency, currencySymbol } = useOrganization();
   const [sales, setSales] = useState<Sale[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,6 +90,12 @@ export const SalesPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#1D1D20]">
         <div>
+          <div className="flex items-center space-x-2 text-apple-blue-bright text-xs font-mono mb-1">
+            <Building2 className="w-3.5 h-3.5" />
+            <span>{organization.name}</span>
+            <span>•</span>
+            <span>Point of Sale ({currencySymbol} {organization.currency})</span>
+          </div>
           <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
             Sales & Order Execution
           </h1>
@@ -216,7 +224,7 @@ export const SalesPage: React.FC = () => {
             {/* Total Price Summary */}
             <div className="p-4 bg-[#161619] rounded-xl border border-apple-border flex items-center justify-between">
               <span className="text-apple-text-secondary text-xs">Total Order Value:</span>
-              <span className="text-xl font-bold tracking-tight text-white">${totalPrice}</span>
+              <span className="text-xl font-bold tracking-tight text-white font-mono">{formatCurrency(Number(totalPrice))}</span>
             </div>
 
             {/* Submit */}
@@ -248,7 +256,7 @@ export const SalesPage: React.FC = () => {
             </div>
             <div className="apple-card p-5">
               <span className="text-[11px] font-mono text-apple-text-secondary">Gross Revenue</span>
-              <div className="font-bold text-2xl text-white mt-1">${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+              <div className="font-bold text-2xl text-white mt-1 font-mono">{formatCurrency(totalRevenue)}</div>
             </div>
           </div>
 
@@ -297,7 +305,7 @@ export const SalesPage: React.FC = () => {
                           {s.quantity}
                         </td>
                         <td className="py-3 px-4 text-right font-mono font-semibold text-white">
-                          ${s.total_price.toFixed(2)}
+                          {formatCurrency(s.total_price)}
                         </td>
                         <td className="py-3 px-4 capitalize text-apple-text-secondary font-mono text-[11px]">
                           {s.customer_type}

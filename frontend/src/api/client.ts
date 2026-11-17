@@ -1,6 +1,7 @@
 import {
   DashboardCharts,
   DashboardStats,
+  OrganizationProfile,
   Product,
   ProductCreate,
   ProductForecast,
@@ -114,7 +115,20 @@ export const api = {
   // Recommendations
   getRecommendations: () => request<RecommendationOverview>("/api/recommendations"),
 
-  // System
+  // System & Organization
+  getOrganization: () => request<OrganizationProfile>("/api/system/organization"),
+
+  updateOrganization: (data: OrganizationProfile) =>
+    request<OrganizationProfile>("/api/system/organization", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+
+  clearCatalog: () =>
+    request<{ success: boolean; message: string }>("/api/system/clear-catalog", {
+      method: "POST",
+    }),
+
   seedDemoData: () =>
     request<{ success: boolean; message: string; stats: { products: number; sales: number } }>("/api/system/seed", {
       method: "POST",
