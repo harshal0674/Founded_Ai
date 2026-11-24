@@ -91,62 +91,54 @@ export const ForecastingPage: React.FC = () => {
   return (
     <div className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto w-full">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#1D1D20]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#EFE7E4]">
         <div>
-          <div className="flex items-center space-x-2 text-apple-blue-bright text-xs font-mono mb-1">
+          <div className="flex items-center space-x-2 text-[#B76E79] text-xs font-mono mb-1 font-semibold">
             <Building2 className="w-3.5 h-3.5" />
             <span>{organization.name}</span>
             <span>•</span>
             <span>Predictive Demand ({currencySymbol} {organization.currency})</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
-            Demand Forecasting Intelligence
+          <h1 className="text-2xl md:text-3xl font-semibold text-apple-text tracking-tight">
+            AI Demand Forecasting
           </h1>
           <p className="text-xs md:text-sm text-apple-text-secondary mt-1">
-            Autoregressive Ridge Regression with day-of-week seasonality, 7-day cyclical lags, and 95% uncertainty envelopes.
+            Autoregressive machine learning projection with uncertainty bands, day-of-week seasonality, and trend estimation.
           </p>
         </div>
 
         <button
           onClick={() => fetchForecast(selectedProductId, horizonDays)}
-          disabled={!selectedProductId}
-          className="apple-btn-secondary text-xs py-2 px-3.5 flex items-center space-x-1.5 self-start sm:self-auto disabled:opacity-40"
+          className="apple-btn-secondary text-xs py-2 px-3.5 flex items-center space-x-1.5 self-start sm:self-auto"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-apple-blue-bright" : ""}`} />
-          <span>Retrain & Recalibrate</span>
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-[#B76E79]" : ""}`} />
+          <span>Retrain Model</span>
         </button>
       </div>
 
-      {/* Empty State if no products exist */}
-      {products.length === 0 && (
-        <div className="apple-card p-10 text-center space-y-4">
-          <PackagePlus className="w-8 h-8 text-apple-blue-bright mx-auto" />
-          <h3 className="text-base font-semibold text-white">No Catalog Products Available</h3>
-          <p className="text-xs text-apple-text-secondary max-w-md mx-auto">
-            Please add products to your inventory catalog in the Inventory tab to train the demand forecasting models.
-          </p>
-        </div>
-      )}
-
-      {/* Control Selector Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 apple-card p-4 items-center">
-        <div className="md:col-span-8">
-          <label className="block text-apple-text-secondary font-mono text-[11px] mb-1.5">Selected Target SKU</label>
-          <select
-            value={selectedProductId}
-            onChange={(e) => setSelectedProductId(e.target.value)}
-            className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-xs text-white focus:outline-none focus:border-apple-blue-bright"
-          >
-            {products.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name} ({p.sku}) — {p.category}
-              </option>
-            ))}
-          </select>
+      {/* Product & Horizon Selector */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 apple-card p-6 bg-white border border-[#EFE7E4]">
+        <div className="md:col-span-8 space-y-2">
+          <label className="block text-xs font-medium text-apple-text-secondary">Target SKU Selection</label>
+          {products.length > 0 ? (
+            <select
+              value={selectedProductId}
+              onChange={(e) => setSelectedProductId(e.target.value)}
+              className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-medium text-xs focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
+            >
+              {products.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} ({p.sku}) — Current: {p.current_stock} units
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className="text-xs text-apple-text-secondary font-mono">No products found. Add products in the inventory page.</div>
+          )}
         </div>
 
-        <div className="md:col-span-4">
-          <label className="block text-apple-text-secondary font-mono text-[11px] mb-1.5">Projection Horizon</label>
+        <div className="md:col-span-4 space-y-2">
+          <label className="block text-xs font-medium text-apple-text-secondary">Forecast Horizon</label>
           <div className="grid grid-cols-3 gap-2">
             {[14, 30, 60].map((h) => (
               <button
@@ -155,8 +147,8 @@ export const ForecastingPage: React.FC = () => {
                 onClick={() => setHorizonDays(h)}
                 className={`py-2 rounded-xl text-xs font-mono transition-all ${
                   horizonDays === h
-                    ? "bg-apple-blue text-white font-semibold shadow-glow-blue-subtle"
-                    : "bg-[#18181C] text-apple-text-secondary border border-apple-border hover:text-white"
+                    ? "bg-gradient-to-r from-[#C5808B] to-[#B76E79] text-white font-semibold shadow-sm"
+                    : "bg-[#FAF8F5] text-apple-text-secondary border border-[#EFE7E4] hover:text-apple-text"
                 }`}
               >
                 {h} Days
@@ -168,7 +160,7 @@ export const ForecastingPage: React.FC = () => {
 
       {/* Error Notice */}
       {error && (
-        <div className="p-4 bg-apple-red/10 border border-apple-red/30 rounded-xl text-xs text-apple-red flex items-center space-x-2">
+        <div className="p-4 bg-apple-red/10 border border-apple-red/30 rounded-xl text-xs text-apple-red flex items-center space-x-2 font-medium">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -177,9 +169,9 @@ export const ForecastingPage: React.FC = () => {
       {/* Evaluated Model Performance Cards */}
       {forecastData && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="apple-card p-4 space-y-1">
+          <div className="apple-card p-4 space-y-1 bg-white border border-[#EFE7E4]">
             <span className="text-[10px] font-mono text-apple-text-secondary uppercase">Model Architecture</span>
-            <div className="font-semibold text-xs text-white truncate" title={forecastData.model_used}>
+            <div className="font-semibold text-xs text-apple-text truncate" title={forecastData.model_used}>
               {forecastData.metrics.is_fallback ? "Moving Average Fallback" : "Ridge Regression"}
             </div>
             <div className="text-[10px] text-apple-text-secondary font-mono">
@@ -187,23 +179,23 @@ export const ForecastingPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="apple-card p-4 space-y-1">
+          <div className="apple-card p-4 space-y-1 bg-white border border-[#EFE7E4]">
             <span className="text-[10px] font-mono text-apple-text-secondary uppercase">Mean Abs Error (MAE)</span>
-            <div className="font-bold text-2xl text-white">
+            <div className="font-bold text-2xl text-apple-text">
               {forecastData.metrics.mae} <span className="text-xs font-normal text-apple-text-secondary">units</span>
             </div>
             <div className="text-[10px] text-apple-text-secondary font-mono">Holdout error</div>
           </div>
 
-          <div className="apple-card p-4 space-y-1">
+          <div className="apple-card p-4 space-y-1 bg-white border border-[#EFE7E4]">
             <span className="text-[10px] font-mono text-apple-text-secondary uppercase">Root Mean Sq (RMSE)</span>
-            <div className="font-bold text-2xl text-white">
+            <div className="font-bold text-2xl text-apple-text">
               {forecastData.metrics.rmse} <span className="text-xs font-normal text-apple-text-secondary">units</span>
             </div>
             <div className="text-[10px] text-apple-text-secondary font-mono">Penalizes large errors</div>
           </div>
 
-          <div className="apple-card p-4 space-y-1">
+          <div className="apple-card p-4 space-y-1 bg-white border border-[#EFE7E4]">
             <span className="text-[10px] font-mono text-apple-text-secondary uppercase">MAPE Accuracy</span>
             <div className="font-bold text-2xl text-apple-green">
               {forecastData.metrics.mape}%
@@ -211,9 +203,9 @@ export const ForecastingPage: React.FC = () => {
             <div className="text-[10px] text-apple-text-secondary font-mono">Relative error</div>
           </div>
 
-          <div className="apple-card p-4 space-y-1 col-span-2 md:col-span-1">
+          <div className="apple-card p-4 space-y-1 col-span-2 md:col-span-1 bg-white border border-[#EFE7E4]">
             <span className="text-[10px] font-mono text-apple-text-secondary uppercase">Expected Horizon Demand</span>
-            <div className="font-bold text-2xl text-apple-blue-bright">
+            <div className="font-bold text-2xl text-[#B76E79]">
               {Math.round(totalForecastUnits).toLocaleString()} <span className="text-xs font-normal text-apple-text-secondary">units</span>
             </div>
             <div className="text-[10px] text-apple-text-secondary font-mono">Next {horizonDays} days</div>
@@ -222,24 +214,24 @@ export const ForecastingPage: React.FC = () => {
       )}
 
       {/* Main Trajectory Visualization */}
-      <div className="apple-card p-6 md:p-8 space-y-6">
+      <div className="apple-card p-6 md:p-8 space-y-6 bg-white border border-[#EFE7E4]">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h3 className="text-base font-semibold text-white tracking-tight">
+            <h3 className="text-base font-semibold text-apple-text tracking-tight">
               Historical Consumption vs. Model Projections
             </h3>
             <p className="text-xs text-apple-text-secondary mt-0.5">
-              Solid line represents recorded historical demand; blue line represents ML prediction with shaded 95% uncertainty interval.
+              Solid line represents recorded historical demand; rose gold dashed line represents ML prediction with shaded 95% uncertainty interval.
             </p>
           </div>
           <div className="flex items-center space-x-4 text-xs font-mono">
             <span className="flex items-center space-x-1.5">
-              <span className="w-3 h-0.5 bg-apple-text-secondary"></span>
+              <span className="w-3 h-0.5 bg-[#6E6468]"></span>
               <span className="text-apple-text-secondary">Historical</span>
             </span>
             <span className="flex items-center space-x-1.5">
-              <span className="w-3 h-0.5 bg-apple-blue-bright"></span>
-              <span className="text-apple-blue-bright font-semibold">Forecast</span>
+              <span className="w-3 h-0.5 bg-[#B76E79]"></span>
+              <span className="text-[#B76E79] font-semibold">Forecast</span>
             </span>
           </div>
         </div>
@@ -247,39 +239,40 @@ export const ForecastingPage: React.FC = () => {
         <div className="h-80 w-full">
           {loading ? (
             <div className="h-full flex items-center justify-center text-xs text-apple-text-secondary font-mono">
-              <RefreshCw className="w-4 h-4 animate-spin text-apple-blue-bright mr-2" />
+              <RefreshCw className="w-4 h-4 animate-spin text-[#B76E79] mr-2" />
               <span>Fitting autoregressive parameters & generating forecast...</span>
             </div>
           ) : chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="appleForecastGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0A84FF" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#0A84FF" stopOpacity={0.02} />
+                  <linearGradient id="roseForecastGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#B76E79" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#B76E79" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1D1D22" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#F2ECE8" vertical={false} />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 10, fill: "#86868B" }}
-                  axisLine={{ stroke: "#232327" }}
+                  tick={{ fontSize: 10, fill: "#8E8588" }}
+                  axisLine={{ stroke: "#EFE7E4" }}
                   tickLine={false}
                   interval={Math.floor(chartData.length / 10)}
                 />
                 <YAxis
-                  tick={{ fontSize: 10, fill: "#86868B" }}
+                  tick={{ fontSize: 10, fill: "#8E8588" }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#161618",
-                    borderColor: "#28282C",
+                    backgroundColor: "#FFFFFF",
+                    borderColor: "#EFE7E4",
                     borderRadius: "12px",
-                    color: "#FFFFFF",
+                    color: "#1C191A",
                     fontSize: "11px",
-                    fontFamily: "Inter, sans-serif"
+                    fontFamily: "Inter, sans-serif",
+                    boxShadow: "0 8px 30px -4px rgba(183, 110, 121, 0.15)"
                   }}
                   formatter={(val: any, name: any) => [
                     val !== null ? `${Number(val).toFixed(1)} units` : "-",
@@ -290,23 +283,23 @@ export const ForecastingPage: React.FC = () => {
                   type="monotone"
                   dataKey="upper_bound"
                   stroke="none"
-                  fill="url(#appleForecastGrad)"
+                  fill="url(#roseForecastGrad)"
                 />
                 <Line
                   type="monotone"
                   dataKey="historical"
-                  stroke="#86868B"
+                  stroke="#6E6468"
                   strokeWidth={1.5}
-                  dot={{ r: 2, fill: "#86868B" }}
+                  dot={{ r: 2, fill: "#6E6468" }}
                   connectNulls={false}
                 />
                 <Line
                   type="monotone"
                   dataKey="predicted"
-                  stroke="#0A84FF"
+                  stroke="#B76E79"
                   strokeWidth={2.5}
                   strokeDasharray="4 2"
-                  dot={{ r: 2.5, fill: "#0A84FF" }}
+                  dot={{ r: 2.5, fill: "#B76E79" }}
                   connectNulls={false}
                 />
               </ComposedChart>
@@ -321,9 +314,9 @@ export const ForecastingPage: React.FC = () => {
 
       {/* Model Technical Documentation */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="apple-card p-6 text-xs space-y-2.5">
-          <div className="flex items-center space-x-2 font-semibold text-white">
-            <Cpu className="w-4 h-4 text-apple-blue-bright" />
+        <div className="apple-card p-6 text-xs space-y-2.5 bg-white border border-[#EFE7E4]">
+          <div className="flex items-center space-x-2 font-semibold text-apple-text">
+            <Cpu className="w-4 h-4 text-[#B76E79]" />
             <span>Feature Engineering & L2 Regularization</span>
           </div>
           <p className="text-apple-text-secondary leading-relaxed">
@@ -331,9 +324,9 @@ export const ForecastingPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="apple-card p-6 text-xs space-y-2.5">
-          <div className="flex items-center space-x-2 font-semibold text-white">
-            <Info className="w-4 h-4 text-apple-blue-bright" />
+        <div className="apple-card p-6 text-xs space-y-2.5 bg-white border border-[#EFE7E4]">
+          <div className="flex items-center space-x-2 font-semibold text-apple-text">
+            <Info className="w-4 h-4 text-[#B76E79]" />
             <span>Uncertainty Expansion</span>
           </div>
           <p className="text-apple-text-secondary leading-relaxed">

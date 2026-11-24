@@ -30,8 +30,8 @@ export const CinematicMotionBackground: React.FC = () => {
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     window.addEventListener("resize", handleResize);
 
-    // 1. Telemetry Nodes (Inventory Flow Grid)
-    const nodeCount = Math.floor(Math.min(width, 1400) / 38);
+    // 1. Telemetry Nodes (Delicate Rose Gold Inventory Flow Grid)
+    const nodeCount = Math.floor(Math.min(width, 1400) / 42);
     const nodes: Array<{
       x: number;
       y: number;
@@ -49,10 +49,10 @@ export const CinematicMotionBackground: React.FC = () => {
         x,
         y,
         baseY: y,
-        speed: 0.15 + Math.random() * 0.35,
-        radius: 1 + Math.random() * 1.8,
+        speed: 0.12 + Math.random() * 0.28,
+        radius: 1 + Math.random() * 1.6,
         phase: Math.random() * Math.PI * 2,
-        alpha: 0.2 + Math.random() * 0.45,
+        alpha: 0.15 + Math.random() * 0.35,
       });
     }
 
@@ -66,7 +66,7 @@ export const CinematicMotionBackground: React.FC = () => {
 
       ctx.clearRect(0, 0, width, height);
 
-      // --- Layer A: Ambient Radial Spotlight following cursor ---
+      // --- Layer A: Ambient Radial Spotlight following cursor (Rose Gold aura) ---
       const mouseGrad = ctx.createRadialGradient(
         mouse.x,
         mouse.y,
@@ -75,13 +75,13 @@ export const CinematicMotionBackground: React.FC = () => {
         mouse.y,
         Math.min(width * 0.5, 550)
       );
-      mouseGrad.addColorStop(0, "rgba(10, 132, 255, 0.09)");
-      mouseGrad.addColorStop(0.5, "rgba(94, 92, 230, 0.03)");
-      mouseGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      mouseGrad.addColorStop(0, "rgba(183, 110, 121, 0.07)");
+      mouseGrad.addColorStop(0.5, "rgba(226, 180, 189, 0.025)");
+      mouseGrad.addColorStop(1, "rgba(250, 248, 245, 0)");
       ctx.fillStyle = mouseGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // --- Layer B: Top Ambient Blue/Cyan Core Glow ---
+      // --- Layer B: Top Ambient Rose Gold / Champagne Core Glow ---
       const topGrad = ctx.createRadialGradient(
         width * 0.5,
         120,
@@ -90,80 +90,96 @@ export const CinematicMotionBackground: React.FC = () => {
         120,
         width * 0.6
       );
-      topGrad.addColorStop(0, "rgba(10, 132, 255, 0.14)");
-      topGrad.addColorStop(0.4, "rgba(0, 113, 227, 0.05)");
-      topGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      topGrad.addColorStop(0, "rgba(197, 128, 139, 0.09)");
+      topGrad.addColorStop(0.4, "rgba(183, 110, 121, 0.03)");
+      topGrad.addColorStop(1, "rgba(250, 248, 245, 0)");
       ctx.fillStyle = topGrad;
       ctx.fillRect(0, 0, width, height * 0.85);
 
-      // --- Layer C: Demand Flow Waveform Lines ---
-      waveOffset += 0.008;
-      const drawFlowWave = (
-        yBase: number,
-        amplitude: number,
-        frequency: number,
-        color: string,
-        strokeWidth: number,
-        offsetMultiplier: number
-      ) => {
+      // --- Layer C: Demand Flow Waveform Lines (Delicate Rose Gold curves) ---
+      waveOffset += 0.007;
+
+      const waves = [
+        {
+          amplitude: 28,
+          frequency: 0.0018,
+          yOffset: height * 0.42,
+          color: "rgba(183, 110, 121, 0.14)",
+          lineWidth: 1.2,
+          speed: 1.0,
+        },
+        {
+          amplitude: 38,
+          frequency: 0.0012,
+          yOffset: height * 0.48,
+          color: "rgba(197, 128, 139, 0.10)",
+          lineWidth: 1.5,
+          speed: 0.75,
+        },
+        {
+          amplitude: 20,
+          frequency: 0.0024,
+          yOffset: height * 0.54,
+          color: "rgba(212, 163, 115, 0.09)",
+          lineWidth: 1.0,
+          speed: 1.25,
+        },
+      ];
+
+      waves.forEach((w) => {
         ctx.beginPath();
-        for (let x = 0; x <= width; x += 12) {
+        ctx.strokeStyle = w.color;
+        ctx.lineWidth = w.lineWidth;
+
+        for (let x = 0; x <= width; x += 6) {
+          const distanceToMouse = Math.abs(x - mouse.x);
+          const mouseDamp = Math.max(0, 1 - distanceToMouse / (width * 0.35));
+          const interactiveWarp = Math.sin((x - mouse.x) * 0.015) * 12 * mouseDamp;
+
           const y =
-            yBase +
-            Math.sin(x * frequency + waveOffset * offsetMultiplier) * amplitude +
-            Math.cos(x * frequency * 0.5 + waveOffset * 0.7) * (amplitude * 0.4);
+            w.yOffset +
+            Math.sin(x * w.frequency + waveOffset * w.speed) * w.amplitude +
+            Math.cos(x * w.frequency * 0.5 + waveOffset * 0.5) * (w.amplitude * 0.4) +
+            interactiveWarp;
+
           if (x === 0) {
             ctx.moveTo(x, y);
           } else {
             ctx.lineTo(x, y);
           }
         }
-        ctx.strokeStyle = color;
-        ctx.lineWidth = strokeWidth;
         ctx.stroke();
-      };
+      });
 
-      // Flowing background wave graphs (subtle opacity)
-      drawFlowWave(height * 0.32, 38, 0.0022, "rgba(10, 132, 255, 0.07)", 1.5, 1.2);
-      drawFlowWave(height * 0.36, 48, 0.0018, "rgba(94, 92, 230, 0.06)", 1.2, 0.9);
-      drawFlowWave(height * 0.68, 44, 0.002, "rgba(48, 209, 88, 0.04)", 1.0, 1.1);
-
-      // --- Layer D: Telemetry Nodes & Connecting Lines ---
+      // --- Layer D: Telemetry Nodes (Soft Rose Gold Data Points) ---
       for (let i = 0; i < nodes.length; i++) {
-        const n = nodes[i];
-        n.phase += 0.015;
-        n.y = n.baseY + Math.sin(n.phase) * 14;
+        const node = nodes[i];
+        node.phase += node.speed * 0.04;
+        node.y = node.baseY + Math.sin(node.phase) * 14;
 
-        // Draw connecting hairlines between nearby nodes
+        // Subtle proximity connection to adjacent nodes
         for (let j = i + 1; j < nodes.length; j++) {
-          const n2 = nodes[j];
-          const dx = n.x - n2.x;
-          const dy = n.y - n2.y;
+          const other = nodes[j];
+          const dx = other.x - node.x;
+          const dy = other.y - node.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
+
           if (dist < 110) {
             const lineAlpha = (1 - dist / 110) * 0.08;
+            ctx.strokeStyle = `rgba(183, 110, 121, ${lineAlpha})`;
+            ctx.lineWidth = 0.75;
             ctx.beginPath();
-            ctx.moveTo(n.x, n.y);
-            ctx.lineTo(n2.x, n2.y);
-            ctx.strokeStyle = `rgba(10, 132, 255, ${lineAlpha})`;
-            ctx.lineWidth = 0.8;
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(other.x, other.y);
             ctx.stroke();
           }
         }
 
         // Draw node dot
+        ctx.fillStyle = `rgba(183, 110, 121, ${node.alpha * 0.65})`;
         ctx.beginPath();
-        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(245, 245, 247, ${n.alpha * 0.55})`;
+        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
         ctx.fill();
-
-        // Occasional blue accent node
-        if (i % 5 === 0) {
-          ctx.beginPath();
-          ctx.arc(n.x, n.y, n.radius * 2.2, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(10, 132, 255, 0.12)";
-          ctx.fill();
-        }
       }
 
       animationFrameId = requestAnimationFrame(render);
@@ -172,38 +188,37 @@ export const CinematicMotionBackground: React.FC = () => {
     render();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-      {/* 1. Subtle High-Tech Isometric Grid Overlay */}
+      {/* 1. Underlying warm off-white canvas */}
+      <div className="absolute inset-0 bg-[#FAF8F5]" />
+
+      {/* 2. Delicate Rose Gold Ambient Glows */}
+      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[900px] h-[450px] bg-gradient-to-b from-[#B76E79]/8 via-[#C5808B]/4 to-transparent rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[-15%] right-[-5%] w-[650px] h-[450px] bg-gradient-to-tl from-[#D4A373]/6 to-transparent rounded-full blur-[130px] pointer-events-none" />
+
+      {/* 3. Interactive WebGL/2D Canvas */}
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block" />
+
+      {/* 4. Delicate architectural grid overlay */}
       <div
-        className="absolute inset-0 opacity-[0.22]"
+        className="absolute inset-0 pointer-events-none opacity-[0.4]"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px)
+            linear-gradient(to right, rgba(183, 110, 121, 0.04) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(183, 110, 121, 0.04) 1px, transparent 1px)
           `,
-          backgroundSize: "64px 64px",
-          maskImage: "radial-gradient(ellipse 90% 80% at 50% 25%, black 40%, transparent 85%)",
-          WebkitMaskImage: "radial-gradient(ellipse 90% 80% at 50% 25%, black 40%, transparent 85%)",
+          backgroundSize: "60px 60px",
+          maskImage: "radial-gradient(ellipse at 50% 30%, black 20%, transparent 80%)",
+          WebkitMaskImage: "radial-gradient(ellipse at 50% 30%, black 20%, transparent 80%)",
         }}
       />
-
-      {/* 2. Interactive Canvas for dynamic waveforms & neural inventory nodes */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
-      />
-
-      {/* 3. Deep Atmospheric Gradient Aura Orbs */}
-      <div className="absolute -top-32 left-1/4 w-[600px] h-[600px] bg-apple-blue/10 rounded-full blur-[140px] pointer-events-none animate-pulse duration-[8000ms]" />
-      <div className="absolute top-1/3 -right-32 w-[550px] h-[550px] bg-[#5E5CE6]/8 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute top-2/3 -left-32 w-[600px] h-[600px] bg-[#30D158]/5 rounded-full blur-[160px] pointer-events-none" />
     </div>
   );
 };

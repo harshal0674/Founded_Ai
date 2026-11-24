@@ -144,42 +144,44 @@ export const InventoryPage: React.FC = () => {
   const handleRestockSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeProduct) return;
-    const finalQty = Number(restockQty);
-    if (!finalQty || finalQty <= 0) {
-      alert("Please enter a valid restock quantity of at least 1 unit.");
-      return;
-    }
     setFormLoading(true);
     try {
-      await api.restockProduct(activeProduct.id, finalQty);
+      await api.restockProduct(activeProduct.id, Number(restockQty));
       setIsRestockModalOpen(false);
       setActiveProduct(null);
       loadProducts();
+      window.dispatchEvent(new CustomEvent("stockmind:refresh"));
     } catch (err: any) {
-      alert(`Restock error: ${err.message}`);
+      alert(`Restock failed: ${err.message}`);
     } finally {
       setFormLoading(false);
     }
   };
 
   const handleClearCatalog = async () => {
-    if (!window.confirm("Wipe all existing products and start with a completely empty catalog for your organization?")) {
+    if (!window.confirm("Wipe all products and sales so you can enter your own catalog from scratch?")) {
       return;
     }
+    setLoading(true);
     try {
       await clearCatalog();
       loadProducts();
-    } catch (err: any) {
-      alert(`Failed to clear catalog: ${err.message}`);
+    } catch (e: any) {
+      alert(`Error clearing catalog: ${e.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSeedDemo = async () => {
+    setLoading(true);
     try {
       await reloadDemoData();
       loadProducts();
-    } catch (err: any) {
-      alert(`Failed to seed demo: ${err.message}`);
+    } catch (e: any) {
+      alert(`Seed failed: ${e.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -195,7 +197,7 @@ export const InventoryPage: React.FC = () => {
       selling_price: p.selling_price,
       lead_time_days: p.lead_time_days,
       supplier_name: p.supplier_name,
-      supplier_email: p.supplier_email || ""
+      supplier_email: p.supplier_email
     });
     setFormError(null);
     setIsEditModalOpen(true);
@@ -236,7 +238,6 @@ export const InventoryPage: React.FC = () => {
     "Home & Kitchen"
   ];
 
-  // Derive unique categories from active products + defaults
   const availableCategories = Array.from(new Set([
     ...defaultCategories,
     ...products.map((p) => p.category).filter(Boolean)
@@ -245,15 +246,15 @@ export const InventoryPage: React.FC = () => {
   return (
     <div className="p-6 md:p-10 space-y-6 max-w-7xl mx-auto w-full">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#1D1D20]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#EFE7E4]">
         <div>
-          <div className="flex items-center space-x-2 text-apple-blue-bright text-xs font-mono mb-1">
+          <div className="flex items-center space-x-2 text-[#B76E79] text-xs font-mono mb-1 font-semibold">
             <Building2 className="w-3.5 h-3.5" />
             <span>{organization.name}</span>
             <span>•</span>
             <span>Currency: {currencySymbol} {organization.currency}</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-semibold text-apple-text tracking-tight">
             Inventory & SKU Catalog
           </h1>
           <p className="text-xs md:text-sm text-apple-text-secondary mt-1">
@@ -287,7 +288,7 @@ export const InventoryPage: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 apple-card p-3.5">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 apple-card p-3.5 bg-white border border-[#EFE7E4]">
         {/* Search */}
         <div className="md:col-span-5 relative">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-apple-text-secondary" />
@@ -296,7 +297,7 @@ export const InventoryPage: React.FC = () => {
             placeholder="Search by product name, SKU, or supplier..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-3 py-2 text-xs bg-[#18181C] border border-[#26262B] rounded-xl text-white placeholder-apple-text-tertiary focus:outline-none focus:border-apple-blue-bright"
+            className="w-full pl-10 pr-3 py-2 text-xs bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text placeholder-apple-text-tertiary focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
           />
         </div>
 
@@ -305,13 +306,11 @@ export const InventoryPage: React.FC = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full py-2 px-3 text-xs bg-[#18181C] border border-[#26262B] rounded-xl text-apple-text focus:outline-none focus:border-apple-blue-bright"
+            className="w-full px-3 py-2 text-xs bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
           >
-            <option value="all">Category: All Categories</option>
+            <option value="all">All Categories ({availableCategories.length})</option>
             {availableCategories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
+              <option key={c} value={c}>{c}</option>
             ))}
           </select>
         </div>
@@ -321,26 +320,26 @@ export const InventoryPage: React.FC = () => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="w-full py-2 px-3 text-xs bg-[#18181C] border border-[#26262B] rounded-xl text-apple-text focus:outline-none focus:border-apple-blue-bright"
+            className="w-full px-3 py-2 text-xs bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
           >
-            <option value="all">Status: All</option>
-            <option value="in_stock">In Stock</option>
-            <option value="low_stock">Low Stock Warning</option>
-            <option value="out_of_stock">Out of Stock</option>
+            <option value="all">All Stock Statuses</option>
+            <option value="in_stock">In Stock (Healthy)</option>
+            <option value="low_stock">Low Stock (Alert)</option>
+            <option value="out_of_stock">Out of Stock (Zero)</option>
           </select>
         </div>
       </div>
 
       {/* Empty State Banner when 0 products exist */}
       {!loading && products.length === 0 && (
-        <div className="apple-card p-10 md:p-14 text-center space-y-5 border border-dashed border-apple-border/80">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-apple-blue/10 border border-apple-blue/30 flex items-center justify-center text-apple-blue-bright">
+        <div className="apple-card p-10 md:p-14 text-center space-y-5 border border-dashed border-[#DE9FAD]/60 bg-white">
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-[#FDF5F6] border border-[#F6D9DE] flex items-center justify-center text-[#B76E79]">
             <PackagePlus className="w-7 h-7" />
           </div>
           <div className="max-w-md mx-auto space-y-2">
-            <h3 className="text-lg font-semibold text-white">Your SKU Catalog is Empty</h3>
+            <h3 className="text-lg font-semibold text-apple-text">Your SKU Catalog is Empty</h3>
             <p className="text-xs text-apple-text-secondary leading-relaxed">
-              Start adding the products for <strong className="text-white">{organization.name}</strong> to unlock automated stock deduction, ML demand forecasting, and reorder intelligence.
+              Start adding the products for <strong className="text-apple-text">{organization.name}</strong> to unlock automated stock deduction, ML demand forecasting, and reorder intelligence.
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -356,7 +355,7 @@ export const InventoryPage: React.FC = () => {
             </button>
             <button
               onClick={handleSeedDemo}
-              className="apple-btn-secondary text-xs py-2.5 px-4 flex items-center space-x-2 text-apple-text-secondary hover:text-white"
+              className="apple-btn-secondary text-xs py-2.5 px-4 flex items-center space-x-2 text-apple-text-secondary hover:text-[#B76E79]"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Load Sample Indian Retail SKUs</span>
@@ -365,12 +364,12 @@ export const InventoryPage: React.FC = () => {
         </div>
       )}
 
-      {/* Product Table (Apple Clean Table) */}
+      {/* Product Table (Minimalist Clean Light Table) */}
       {(loading || products.length > 0) && (
-        <div className="apple-card overflow-hidden">
+        <div className="apple-card overflow-hidden bg-white border border-[#EFE7E4]">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#151518] border-b border-[#232327] font-mono text-[11px] text-apple-text-secondary">
+              <thead className="bg-[#FAF6F4] border-b border-[#EFE7E4] font-mono text-[11px] text-apple-text-secondary">
                 <tr>
                   <th className="py-3.5 px-5 font-medium">Product / SKU</th>
                   <th className="py-3.5 px-5 font-medium">Category</th>
@@ -383,12 +382,12 @@ export const InventoryPage: React.FC = () => {
                   <th className="py-3.5 px-5 font-medium text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#1D1D22]">
+              <tbody className="divide-y divide-[#F2ECE8]">
                 {loading ? (
                   <tr>
                     <td colSpan={9} className="py-12 text-center text-apple-text-secondary font-mono">
                       <div className="flex items-center justify-center space-x-2">
-                        <RefreshCw className="w-4 h-4 animate-spin text-apple-blue-bright" />
+                        <RefreshCw className="w-4 h-4 animate-spin text-[#B76E79]" />
                         <span>Loading inventory catalog for {organization.name}...</span>
                       </div>
                     </td>
@@ -396,13 +395,13 @@ export const InventoryPage: React.FC = () => {
                 ) : (
                   products.map((p) => {
                     let badge = (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-green/10 text-apple-green border border-apple-green/20">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-green/10 text-apple-green border border-apple-green/20 font-medium">
                         In Stock
                       </span>
                     );
                     if (p.stock_status === "low_stock") {
                       badge = (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-orange/10 text-apple-orange border border-apple-orange/20">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-apple-orange/10 text-apple-orange border border-apple-orange/20 font-medium">
                           Low Stock
                         </span>
                       );
@@ -415,13 +414,13 @@ export const InventoryPage: React.FC = () => {
                     }
 
                     return (
-                      <tr key={p.id} className="hover:bg-[#16161A] transition-colors">
+                      <tr key={p.id} className="hover:bg-[#FCFAF8] transition-colors">
                         <td className="py-4 px-5">
-                          <div className="font-semibold text-white">{p.name}</div>
-                          <div className="font-mono text-[11px] text-apple-text-secondary">{p.sku}</div>
+                          <div className="font-semibold text-apple-text">{p.name}</div>
+                          <div className="font-mono text-[11px] text-[#B76E79] font-medium">{p.sku}</div>
                         </td>
                         <td className="py-4 px-5 text-apple-text-secondary">{p.category}</td>
-                        <td className="py-4 px-5 text-right font-mono font-medium text-white">
+                        <td className="py-4 px-5 text-right font-mono font-medium text-apple-text">
                           {p.current_stock.toLocaleString()}
                         </td>
                         <td className="py-4 px-5 text-right font-mono text-apple-text-secondary">
@@ -430,31 +429,31 @@ export const InventoryPage: React.FC = () => {
                         <td className="py-4 px-5 text-right font-mono text-apple-text-secondary">
                           {formatCurrency(p.unit_cost)}
                         </td>
-                        <td className="py-4 px-5 text-right font-mono text-white font-semibold">
+                        <td className="py-4 px-5 text-right font-mono text-apple-text font-semibold">
                           {formatCurrency(p.selling_price)}
                         </td>
-                        <td className="py-4 px-5 text-right font-mono font-medium text-white">
+                        <td className="py-4 px-5 text-right font-mono font-medium text-[#B76E79]">
                           {formatCurrency(p.total_value)}
                         </td>
                         <td className="py-4 px-5">{badge}</td>
                         <td className="py-4 px-5 text-right space-x-1.5 whitespace-nowrap">
                           <button
                             onClick={() => openRestockModal(p)}
-                            className="p-1.5 rounded-lg hover:bg-apple-blue/20 text-apple-blue-bright transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-[#FDF5F6] text-[#B76E79] transition-colors"
                             title="Quick Restock"
                           >
                             <PackagePlus className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => openEditModal(p)}
-                            className="p-1.5 rounded-lg hover:bg-[#25252A] text-apple-text-secondary hover:text-white transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-[#FAF4F3] text-apple-text-secondary hover:text-apple-text transition-colors"
                             title="Edit Product"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(p.id, p.name)}
-                            className="p-1.5 rounded-lg hover:bg-apple-red/20 text-apple-red transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-apple-red/15 text-apple-red transition-colors"
                             title="Delete Product"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -472,15 +471,15 @@ export const InventoryPage: React.FC = () => {
 
       {/* Add / Edit Modal */}
       {(isAddModalOpen || isEditModalOpen) && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#121214] rounded-2xl border border-[#28282D] w-full max-w-xl shadow-2xl p-6 md:p-8 space-y-5 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-[#232327]">
+        <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-[#EFE7E4] w-full max-w-xl shadow-apple-elevated p-6 md:p-8 space-y-5 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-4 border-b border-[#EFE7E4]">
               <div>
-                <h3 className="text-lg font-semibold text-white tracking-tight">
+                <h3 className="text-lg font-semibold text-apple-text tracking-tight">
                   {isAddModalOpen ? "Add New Product SKU" : `Edit SKU: ${activeProduct?.sku}`}
                 </h3>
                 <p className="text-[11px] text-apple-text-secondary">
-                  Organization: <strong className="text-white">{organization.name}</strong> · All prices in {currencySymbol} {organization.currency}
+                  Organization: <strong className="text-apple-text">{organization.name}</strong> · All prices in {currencySymbol} {organization.currency}
                 </p>
               </div>
               <button
@@ -488,14 +487,14 @@ export const InventoryPage: React.FC = () => {
                   setIsAddModalOpen(false);
                   setIsEditModalOpen(false);
                 }}
-                className="text-apple-text-secondary hover:text-white"
+                className="text-apple-text-secondary hover:text-apple-text"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {formError && (
-              <div className="p-3 bg-apple-red/10 border border-apple-red/30 rounded-xl text-xs text-apple-red">
+              <div className="p-3 bg-apple-red/10 border border-apple-red/30 rounded-xl text-xs text-apple-red font-medium">
                 {formError}
               </div>
             )}
@@ -509,7 +508,7 @@ export const InventoryPage: React.FC = () => {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white focus:outline-none focus:border-apple-blue-bright"
+                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                     placeholder="e.g. Basmati Rice 5kg, Boat Earbuds, Tata Tea 500g"
                   />
                 </div>
@@ -520,7 +519,7 @@ export const InventoryPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={generateAutoSku}
-                      className="text-[10px] text-apple-blue-bright hover:underline flex items-center space-x-1"
+                      className="text-[10px] text-[#B76E79] hover:underline flex items-center space-x-1 font-semibold"
                     >
                       <Sparkles className="w-3 h-3" />
                       <span>Auto-Generate</span>
@@ -531,7 +530,7 @@ export const InventoryPage: React.FC = () => {
                     required
                     value={formData.sku}
                     onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
+                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                     placeholder="e.g. SKU-IN-101"
                   />
                 </div>
@@ -541,7 +540,7 @@ export const InventoryPage: React.FC = () => {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white focus:outline-none focus:border-apple-blue-bright"
+                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                   >
                     {availableCategories.map((cat) => (
                       <option key={cat} value={cat}>
@@ -562,7 +561,7 @@ export const InventoryPage: React.FC = () => {
                     onBlur={() => {
                       if (formData.current_stock === "") setFormData((prev: any) => ({ ...prev, current_stock: 0 }));
                     }}
-                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
+                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                   />
                 </div>
 
@@ -577,7 +576,7 @@ export const InventoryPage: React.FC = () => {
                     onBlur={() => {
                       if (formData.min_stock_level === "") setFormData((prev: any) => ({ ...prev, min_stock_level: 0 }));
                     }}
-                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
+                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                   />
                 </div>
 
@@ -593,7 +592,7 @@ export const InventoryPage: React.FC = () => {
                     onBlur={() => {
                       if (formData.unit_cost === "") setFormData((prev: any) => ({ ...prev, unit_cost: 0 }));
                     }}
-                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
+                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                     placeholder="e.g. 250.00"
                   />
                 </div>
@@ -610,7 +609,7 @@ export const InventoryPage: React.FC = () => {
                     onBlur={() => {
                       if (formData.selling_price === "") setFormData((prev: any) => ({ ...prev, selling_price: 0 }));
                     }}
-                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
+                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                     placeholder="e.g. 499.00"
                   />
                 </div>
@@ -628,7 +627,7 @@ export const InventoryPage: React.FC = () => {
                         setFormData((prev: any) => ({ ...prev, lead_time_days: 1 }));
                       }
                     }}
-                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono focus:outline-none focus:border-apple-blue-bright"
+                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                   />
                 </div>
 
@@ -638,13 +637,13 @@ export const InventoryPage: React.FC = () => {
                     type="text"
                     value={formData.supplier_name || ""}
                     onChange={(e) => setFormData({ ...formData, supplier_name: e.target.value })}
-                    placeholder="e.g. Direct Distributor / Reliance Wholesale"
-                    className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white focus:outline-none focus:border-apple-blue-bright"
+                    placeholder="e.g. Direct Distributor / Wholesale Partner"
+                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                   />
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-[#232327] flex items-center justify-end space-x-3">
+              <div className="pt-4 border-t border-[#EFE7E4] flex items-center justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -670,29 +669,29 @@ export const InventoryPage: React.FC = () => {
 
       {/* Restock Modal */}
       {isRestockModalOpen && activeProduct && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#121214] rounded-2xl border border-[#28282D] w-full max-w-md shadow-2xl p-6 md:p-8 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-[#232327]">
+        <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-[#EFE7E4] w-full max-w-md shadow-apple-elevated p-6 md:p-8 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-[#EFE7E4]">
               <div>
-                <h3 className="text-base font-semibold text-white tracking-tight">
+                <h3 className="text-base font-semibold text-apple-text tracking-tight">
                   Restock: {activeProduct.name}
                 </h3>
-                <p className="text-[11px] text-apple-text-secondary font-mono">{activeProduct.sku}</p>
+                <p className="text-[11px] text-[#B76E79] font-mono font-medium">{activeProduct.sku}</p>
               </div>
-              <button onClick={() => setIsRestockModalOpen(false)} className="text-apple-text-secondary hover:text-white">
+              <button onClick={() => setIsRestockModalOpen(false)} className="text-apple-text-secondary hover:text-apple-text">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleRestockSubmit} className="space-y-4 text-xs">
-              <div className="p-3.5 bg-[#18181C] rounded-xl border border-apple-border space-y-1.5 font-mono">
+              <div className="p-3.5 bg-[#FAF8F5] rounded-xl border border-[#EFE7E4] space-y-1.5 font-mono">
                 <div className="flex justify-between">
                   <span className="text-apple-text-secondary">Current On-Hand:</span>
-                  <span className="text-white font-semibold">{activeProduct.current_stock} units</span>
+                  <span className="text-apple-text font-semibold">{activeProduct.current_stock} units</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-apple-text-secondary">Unit Cost:</span>
-                  <span className="text-white">{formatCurrency(activeProduct.unit_cost)}</span>
+                  <span className="text-apple-text">{formatCurrency(activeProduct.unit_cost)}</span>
                 </div>
               </div>
 
@@ -711,15 +710,15 @@ export const InventoryPage: React.FC = () => {
                       setRestockQty(25);
                     }
                   }}
-                  className="w-full p-3 bg-[#18181C] border border-[#28282D] rounded-xl text-white font-mono text-sm focus:outline-none focus:border-apple-blue-bright"
+                  className="w-full p-3 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono text-sm focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                 />
               </div>
 
               <div className="text-[11px] font-mono text-apple-text-secondary">
-                Estimated Capital Outlay: <strong className="text-white">{formatCurrency((Number(restockQty) || 0) * activeProduct.unit_cost)}</strong>
+                Estimated Capital Outlay: <strong className="text-apple-text">{formatCurrency((Number(restockQty) || 0) * activeProduct.unit_cost)}</strong>
               </div>
 
-              <div className="pt-3 border-t border-[#232327] flex items-center justify-end space-x-3">
+              <div className="pt-3 border-t border-[#EFE7E4] flex items-center justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => setIsRestockModalOpen(false)}

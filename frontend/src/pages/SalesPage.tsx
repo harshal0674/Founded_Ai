@@ -96,15 +96,15 @@ export const SalesPage: React.FC = () => {
   return (
     <div className="p-6 md:p-10 space-y-6 max-w-7xl mx-auto w-full">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#1D1D20]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#EFE7E4]">
         <div>
-          <div className="flex items-center space-x-2 text-apple-blue-bright text-xs font-mono mb-1">
+          <div className="flex items-center space-x-2 text-[#B76E79] text-xs font-mono mb-1 font-semibold">
             <Building2 className="w-3.5 h-3.5" />
             <span>{organization.name}</span>
             <span>•</span>
             <span>Point of Sale ({currencySymbol} {organization.currency})</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-semibold text-apple-text tracking-tight">
             Sales & Order Execution
           </h1>
           <p className="text-xs md:text-sm text-apple-text-secondary mt-1">
@@ -116,7 +116,7 @@ export const SalesPage: React.FC = () => {
           onClick={loadData}
           className="apple-btn-secondary text-xs py-2 px-3.5 flex items-center space-x-1.5 self-start sm:self-auto"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-apple-blue-bright" : ""}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-[#B76E79]" : ""}`} />
           <span>Refresh Ledger</span>
         </button>
       </div>
@@ -124,23 +124,23 @@ export const SalesPage: React.FC = () => {
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Record Order Card */}
-        <div className="lg:col-span-5 apple-card p-6 md:p-7 space-y-5">
-          <div className="flex items-center space-x-2.5 pb-3 border-b border-apple-border">
-            <ShoppingCart className="w-4 h-4 text-apple-blue-bright" />
-            <h3 className="font-semibold text-base text-white tracking-tight">
+        <div className="lg:col-span-5 apple-card p-6 md:p-7 space-y-5 bg-white border border-[#EFE7E4]">
+          <div className="flex items-center space-x-2.5 pb-3 border-b border-[#EFE7E4]">
+            <ShoppingCart className="w-4 h-4 text-[#B76E79]" />
+            <h3 className="font-semibold text-base text-apple-text tracking-tight">
               Record Outbound Order
             </h3>
           </div>
 
           {formSuccess && (
-            <div className="p-3.5 bg-apple-green/10 border border-apple-green/30 rounded-xl text-xs text-apple-green flex items-center space-x-2">
+            <div className="p-3.5 bg-apple-green/10 border border-apple-green/30 rounded-xl text-xs text-apple-green flex items-center space-x-2 font-medium">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>{formSuccess}</span>
             </div>
           )}
 
           {formError && (
-            <div className="p-3.5 bg-apple-red/10 border border-apple-red/30 rounded-xl text-xs text-apple-red flex items-center space-x-2">
+            <div className="p-3.5 bg-apple-red/10 border border-apple-red/30 rounded-xl text-xs text-apple-red flex items-center space-x-2 font-medium">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>{formError}</span>
             </div>
@@ -156,7 +156,7 @@ export const SalesPage: React.FC = () => {
                   setSelectedProductId(e.target.value);
                   setFormError(null);
                 }}
-                className="w-full p-2.5 bg-[#18181C] border border-[#28282D] rounded-xl text-white focus:outline-none focus:border-apple-blue-bright text-xs"
+                className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15 text-xs"
               >
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -168,7 +168,7 @@ export const SalesPage: React.FC = () => {
 
             {/* Current Stock Banner */}
             {selectedProduct && (
-              <div className="p-3.5 rounded-xl bg-[#161619] border border-apple-border flex items-center justify-between font-mono text-[11px]">
+              <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#EFE7E4] flex items-center justify-between font-mono text-[11px]">
                 <span className="text-apple-text-secondary">On-Hand Stock:</span>
                 <span className={`font-semibold ${selectedProduct.current_stock === 0 ? "text-apple-red" : selectedProduct.current_stock <= selectedProduct.min_stock_level ? "text-apple-orange" : "text-apple-green"}`}>
                   {selectedProduct.current_stock} units
@@ -181,7 +181,7 @@ export const SalesPage: React.FC = () => {
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-apple-text-secondary font-medium">Quantity to Deduct *</label>
                 {isStockInsufficient && (
-                  <span className="text-apple-red font-mono text-[11px]">Exceeds on-hand stock!</span>
+                  <span className="text-apple-red font-mono text-[11px] font-semibold">Exceeds on-hand stock!</span>
                 )}
               </div>
               <input
@@ -200,8 +200,8 @@ export const SalesPage: React.FC = () => {
                   }
                 }}
                 placeholder="Enter units (e.g. 5)"
-                className={`w-full p-2.5 bg-[#18181C] border rounded-xl text-white font-mono text-sm focus:outline-none ${
-                  isStockInsufficient ? "border-apple-red bg-apple-red/5" : "border-[#28282D] focus:border-apple-blue-bright"
+                className={`w-full p-2.5 bg-[#FAF8F5] border rounded-xl text-apple-text font-mono text-sm focus:outline-none ${
+                  isStockInsufficient ? "border-apple-red bg-apple-red/5" : "border-[#EFE7E4] focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                 }`}
               />
             </div>
@@ -224,8 +224,8 @@ export const SalesPage: React.FC = () => {
                       onClick={() => setCustomerType(c.id)}
                       className={`py-2.5 px-2 rounded-xl border text-xs flex flex-col items-center justify-center space-y-1 transition-all ${
                         isSelected
-                          ? "bg-apple-blue/15 border-apple-blue-bright text-apple-blue-bright font-semibold shadow-glow-blue-subtle"
-                          : "bg-[#18181C] border-apple-border text-apple-text-secondary hover:text-white"
+                          ? "bg-[#FDF5F6] border-[#F6D9DE] text-[#B76E79] font-semibold shadow-sm"
+                          : "bg-[#FAF8F5] border-[#EFE7E4] text-apple-text-secondary hover:text-apple-text"
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -237,9 +237,9 @@ export const SalesPage: React.FC = () => {
             </div>
 
             {/* Total Price Summary */}
-            <div className="p-4 bg-[#161619] rounded-xl border border-apple-border flex items-center justify-between">
+            <div className="p-4 bg-[#FAF8F5] rounded-xl border border-[#EFE7E4] flex items-center justify-between">
               <span className="text-apple-text-secondary text-xs">Total Order Value:</span>
-              <span className="text-xl font-bold tracking-tight text-white font-mono">{formatCurrency(Number(totalPrice))}</span>
+              <span className="text-xl font-bold tracking-tight text-[#B76E79] font-mono">{formatCurrency(Number(totalPrice))}</span>
             </div>
 
             {/* Submit */}
@@ -248,7 +248,7 @@ export const SalesPage: React.FC = () => {
               disabled={submitting || isStockInsufficient || (numQty <= 0) || (selectedProduct?.current_stock === 0)}
               className={`w-full py-3 rounded-full text-xs font-semibold flex items-center justify-center space-x-2 transition-all ${
                 isStockInsufficient || (numQty <= 0) || (selectedProduct?.current_stock === 0)
-                  ? "opacity-40 cursor-not-allowed bg-apple-surface text-apple-text-tertiary"
+                  ? "opacity-40 cursor-not-allowed bg-gray-100 text-apple-text-tertiary"
                   : "apple-btn-primary shadow-glow-blue"
               }`}
             >
@@ -261,30 +261,30 @@ export const SalesPage: React.FC = () => {
         <div className="lg:col-span-7 space-y-6">
           {/* Quick Metrics Cards */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="apple-card p-5">
+            <div className="apple-card p-5 bg-white border border-[#EFE7E4]">
               <span className="text-[11px] font-mono text-apple-text-secondary">Orders Dispatched</span>
-              <div className="font-bold text-2xl text-white mt-1">{sales.length}</div>
+              <div className="font-bold text-2xl text-apple-text mt-1">{sales.length}</div>
             </div>
-            <div className="apple-card p-5">
+            <div className="apple-card p-5 bg-white border border-[#EFE7E4]">
               <span className="text-[11px] font-mono text-apple-text-secondary">Units Sold</span>
-              <div className="font-bold text-2xl text-white mt-1">{totalUnits.toLocaleString()}</div>
+              <div className="font-bold text-2xl text-apple-text mt-1">{totalUnits.toLocaleString()}</div>
             </div>
-            <div className="apple-card p-5">
+            <div className="apple-card p-5 bg-white border border-[#EFE7E4]">
               <span className="text-[11px] font-mono text-apple-text-secondary">Gross Revenue</span>
-              <div className="font-bold text-2xl text-white mt-1 font-mono">{formatCurrency(totalRevenue)}</div>
+              <div className="font-bold text-2xl text-[#B76E79] mt-1 font-mono">{formatCurrency(totalRevenue)}</div>
             </div>
           </div>
 
           {/* Sales Table */}
-          <div className="apple-card overflow-hidden">
-            <div className="p-4 border-b border-[#232327] bg-[#151518] flex items-center justify-between">
-              <span className="font-semibold text-xs text-white">Transaction Movement Stream</span>
+          <div className="apple-card overflow-hidden bg-white border border-[#EFE7E4]">
+            <div className="p-4 border-b border-[#EFE7E4] bg-[#FAF6F4] flex items-center justify-between">
+              <span className="font-semibold text-xs text-apple-text">Transaction Movement Stream</span>
               <span className="font-mono text-[11px] text-apple-text-secondary">100 most recent records</span>
             </div>
 
             <div className="overflow-x-auto max-h-[500px]">
               <table className="w-full text-left text-xs">
-                <thead className="bg-[#151518] border-b border-[#232327] font-mono text-[11px] text-apple-text-secondary sticky top-0 z-10">
+                <thead className="bg-[#FAF6F4] border-b border-[#EFE7E4] font-mono text-[11px] text-apple-text-secondary sticky top-0 z-10">
                   <tr>
                     <th className="py-3 px-4 font-medium">Timestamp</th>
                     <th className="py-3 px-4 font-medium">Product / SKU</th>
@@ -293,7 +293,7 @@ export const SalesPage: React.FC = () => {
                     <th className="py-3 px-4 font-medium">Channel</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#1D1D22]">
+                <tbody className="divide-y divide-[#F2ECE8]">
                   {loading ? (
                     <tr>
                       <td colSpan={5} className="py-10 text-center text-apple-text-secondary font-mono">
@@ -308,18 +308,18 @@ export const SalesPage: React.FC = () => {
                     </tr>
                   ) : (
                     sales.map((s) => (
-                      <tr key={s.id} className="hover:bg-[#16161A] transition-colors">
+                      <tr key={s.id} className="hover:bg-[#FCFAF8] transition-colors">
                         <td className="py-3 px-4 font-mono text-[11px] text-apple-text-secondary whitespace-nowrap">
                           {new Date(s.timestamp).toLocaleDateString()} {new Date(s.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </td>
                         <td className="py-3 px-4">
-                          <div className="font-medium text-white truncate max-w-[200px]">{s.product_name}</div>
-                          <div className="font-mono text-[10px] text-apple-text-secondary">{s.sku}</div>
+                          <div className="font-medium text-apple-text truncate max-w-[200px]">{s.product_name}</div>
+                          <div className="font-mono text-[10px] text-[#B76E79] font-medium">{s.sku}</div>
                         </td>
-                        <td className="py-3 px-4 text-right font-mono font-medium text-white">
+                        <td className="py-3 px-4 text-right font-mono font-medium text-apple-text">
                           {s.quantity}
                         </td>
-                        <td className="py-3 px-4 text-right font-mono font-semibold text-white">
+                        <td className="py-3 px-4 text-right font-mono font-semibold text-[#B76E79]">
                           {formatCurrency(s.total_price)}
                         </td>
                         <td className="py-3 px-4 capitalize text-apple-text-secondary font-mono text-[11px]">

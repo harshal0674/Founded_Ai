@@ -56,20 +56,20 @@ export const AnalyticsPage: React.FC = () => {
     value: Math.round(value),
   }));
 
-  const COLORS = ["#0A84FF", "#30D158", "#FF9F0A", "#BF5AF2"];
+  const COLORS = ["#B76E79", "#D4A373", "#8FA287", "#C5808B"];
 
   return (
     <div className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto w-full">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#1D1D20]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#EFE7E4]">
         <div>
-          <div className="flex items-center space-x-2 text-apple-blue-bright text-xs font-mono mb-1">
+          <div className="flex items-center space-x-2 text-[#B76E79] text-xs font-mono mb-1 font-semibold">
             <Building2 className="w-3.5 h-3.5" />
             <span>{organization.name}</span>
             <span>•</span>
             <span>Portfolio Valuation ({currencySymbol} {organization.currency})</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-semibold text-apple-text tracking-tight">
             Inventory & Channel Analytics
           </h1>
           <p className="text-xs md:text-sm text-apple-text-secondary mt-1">
@@ -81,40 +81,40 @@ export const AnalyticsPage: React.FC = () => {
           onClick={loadData}
           className="apple-btn-secondary text-xs py-2 px-3.5 flex items-center space-x-1.5 self-start sm:self-auto"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-apple-blue-bright" : ""}`} />
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-[#B76E79]" : ""}`} />
           <span>Refresh Analytics</span>
         </button>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="apple-card p-5 space-y-1">
+        <div className="apple-card p-5 space-y-1 bg-white border border-[#EFE7E4]">
           <span className="text-[11px] font-mono text-apple-text-secondary">Balance Sheet Valuation</span>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-white font-mono">
+          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-text font-mono">
             {stats ? formatCurrency(stats.total_stock_value) : formatCurrency(0)}
           </div>
           <p className="text-[10px] text-apple-text-secondary font-mono">Current capital tied in inventory</p>
         </div>
 
-        <div className="apple-card p-5 space-y-1">
+        <div className="apple-card p-5 space-y-1 bg-white border border-[#EFE7E4]">
           <span className="text-[11px] font-mono text-apple-text-secondary">30-Day Revenue</span>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-white font-mono">
+          <div className="text-2xl md:text-3xl font-bold tracking-tight text-[#B76E79] font-mono">
             {stats ? formatCurrency(stats.total_revenue_30d) : formatCurrency(0)}
           </div>
           <p className="text-[10px] text-apple-text-secondary font-mono">Gross channel throughput</p>
         </div>
 
-        <div className="apple-card p-5 space-y-1">
+        <div className="apple-card p-5 space-y-1 bg-white border border-[#EFE7E4]">
           <span className="text-[11px] font-mono text-apple-text-secondary">Active SKUs</span>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-white">
+          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-text">
             {stats?.total_products || 0}
           </div>
           <p className="text-[10px] text-apple-text-secondary font-mono">Tracked product lines</p>
         </div>
 
-        <div className="apple-card p-5 space-y-1">
+        <div className="apple-card p-5 space-y-1 bg-white border border-[#EFE7E4]">
           <span className="text-[11px] font-mono text-apple-text-secondary">Annualized Turnover</span>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-blue-bright">
+          <div className="text-2xl md:text-3xl font-bold tracking-tight text-[#B76E79]">
             {stats && stats.total_stock_value > 0
               ? (stats.total_revenue_30d / stats.total_stock_value * 12).toFixed(1)
               : "0.0"}x
@@ -126,36 +126,38 @@ export const AnalyticsPage: React.FC = () => {
       {/* Visualizations Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Category Breakdown */}
-        <div className="lg:col-span-7 apple-card p-6 md:p-8 space-y-5">
+        <div className="lg:col-span-7 apple-card p-6 md:p-8 space-y-5 bg-white border border-[#EFE7E4]">
           <div>
-            <h3 className="text-base font-semibold text-white tracking-tight">
+            <h3 className="text-base font-semibold text-apple-text tracking-tight">
               Capital Allocation by Category
             </h3>
-            <p className="text-xs text-apple-text-secondary mt-0.5">Total inventory dollar value held per category</p>
+            <p className="text-xs text-apple-text-secondary mt-0.5">Total inventory value held per category</p>
           </div>
 
           <div className="h-64 w-full">
             {charts?.category_distribution && charts.category_distribution.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={charts.category_distribution} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1D1D22" />
-                  <XAxis dataKey="category" tick={{ fontSize: 10, fill: "#86868B" }} axisLine={{ stroke: "#232327" }} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F2ECE8" />
+                  <XAxis dataKey="category" tick={{ fontSize: 10, fill: "#8E8588" }} axisLine={{ stroke: "#EFE7E4" }} />
                   <YAxis
-                    tick={{ fontSize: 10, fill: "#86868B" }}
+                    tick={{ fontSize: 10, fill: "#8E8588" }}
+                    axisLine={false}
                     tickFormatter={(v) => `${currencySymbol}${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#161618",
-                      borderColor: "#28282C",
+                      backgroundColor: "#FFFFFF",
+                      borderColor: "#EFE7E4",
                       borderRadius: "12px",
-                      color: "#FFFFFF",
+                      color: "#1C191A",
                       fontSize: "11px",
-                      fontFamily: "Inter, sans-serif"
+                      fontFamily: "Inter, sans-serif",
+                      boxShadow: "0 8px 30px -4px rgba(183, 110, 121, 0.15)"
                     }}
                     formatter={(val: any) => [formatCurrency(Number(val)), "Stock Value"]}
                   />
-                  <Bar dataKey="value" fill="#0A84FF" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="value" fill="#B76E79" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -167,9 +169,9 @@ export const AnalyticsPage: React.FC = () => {
         </div>
 
         {/* Channel Share */}
-        <div className="lg:col-span-5 apple-card p-6 md:p-8 space-y-5">
+        <div className="lg:col-span-5 apple-card p-6 md:p-8 space-y-5 bg-white border border-[#EFE7E4]">
           <div>
-            <h3 className="text-base font-semibold text-white tracking-tight">
+            <h3 className="text-base font-semibold text-apple-text tracking-tight">
               Channel Revenue Contribution
             </h3>
             <p className="text-xs text-apple-text-secondary mt-0.5">Retail vs Wholesale vs Online revenue mix</p>
@@ -195,12 +197,13 @@ export const AnalyticsPage: React.FC = () => {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#161618",
-                      borderColor: "#28282C",
+                      backgroundColor: "#FFFFFF",
+                      borderColor: "#EFE7E4",
                       borderRadius: "12px",
-                      color: "#FFFFFF",
+                      color: "#1C191A",
                       fontSize: "11px",
-                      fontFamily: "Inter, sans-serif"
+                      fontFamily: "Inter, sans-serif",
+                      boxShadow: "0 8px 30px -4px rgba(183, 110, 121, 0.15)"
                     }}
                     formatter={(v: any) => [formatCurrency(Number(v)), "Revenue"]}
                   />

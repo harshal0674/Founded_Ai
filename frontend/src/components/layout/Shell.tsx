@@ -114,30 +114,30 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
   ];
 
   return (
-    <div className="min-h-screen bg-[#080808] text-apple-text flex flex-col font-sans antialiased selection:bg-apple-blue/30 selection:text-white">
-      {/* Top Floating Apple Toast */}
+    <div className="min-h-screen bg-[#FAF8F5] text-apple-text flex flex-col font-sans antialiased selection:bg-[#B76E79]/20 selection:text-apple-text">
+      {/* Top Floating Toast */}
       {toastMsg && (
-        <div className="fixed top-5 right-6 z-50 bg-[#161616]/95 backdrop-blur-xl text-white px-4 py-2.5 rounded-full text-xs font-medium shadow-apple-elevated border border-apple-border flex items-center space-x-2.5 animate-fade-in">
-          <span className="w-2 h-2 rounded-full bg-apple-blue-bright"></span>
+        <div className="fixed top-5 right-6 z-50 bg-white/95 backdrop-blur-xl text-apple-text px-4 py-2.5 rounded-full text-xs font-medium shadow-apple-elevated border border-[#EFE7E4] flex items-center space-x-2.5 animate-fade-in">
+          <span className="w-2 h-2 rounded-full bg-[#B76E79]"></span>
           <span>{toastMsg}</span>
         </div>
       )}
 
       {/* Main Container */}
       <div className="flex-1 flex flex-col md:flex-row">
-        {/* Desktop Sidebar (Apple Dark Slate) */}
-        <aside className="hidden md:flex flex-col w-64 border-r border-[#1D1D20] bg-[#0A0A0C] select-none">
+        {/* Desktop Sidebar (Minimalist Off-White & Rose Gold) */}
+        <aside className="hidden md:flex flex-col w-64 border-r border-[#EFE7E4] bg-[#FFFFFF] select-none">
           {/* Logo Brand */}
-          <div className="h-16 px-5 border-b border-[#1D1D20] flex items-center justify-between">
+          <div className="h-16 px-5 border-b border-[#EFE7E4] flex items-center justify-between">
             <button
               onClick={() => navigate("/")}
               className="text-left group flex items-center space-x-2.5 focus:outline-none"
             >
-              <div className="w-8 h-8 rounded-xl bg-[#141418] border border-apple-border/80 overflow-hidden flex items-center justify-center shadow-glow-blue-subtle shrink-0 group-hover:border-apple-blue/50 transition-colors">
+              <div className="w-8 h-8 rounded-xl bg-[#FAF8F5] border border-[#EFE7E4] overflow-hidden flex items-center justify-center shadow-sm shrink-0 group-hover:border-[#B76E79]/50 transition-colors">
                 <img src="/logo.jpg" alt="StockMind Logo" className="w-full h-full object-cover" />
               </div>
               <div>
-                <span className="font-semibold text-white text-sm tracking-tight group-hover:text-apple-blue-bright transition-colors block leading-tight">
+                <span className="font-semibold text-apple-text text-sm tracking-tight group-hover:text-[#B76E79] transition-colors block leading-tight">
                   StockMind AI
                 </span>
                 <span className="text-[10px] text-apple-text-tertiary font-mono">
@@ -145,20 +145,20 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                 </span>
               </div>
             </button>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#161618] border border-apple-border text-apple-blue-bright font-semibold">
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FDF5F6] border border-[#F6D9DE] text-[#B76E79] font-semibold">
               {organization.currency_symbol} {organization.currency}
             </span>
           </div>
 
           {/* Active Organisation Card & Quick Switcher */}
-          <div className="p-3 border-b border-[#1D1D20] bg-[#0E0E12]">
-            <div className="p-2.5 rounded-xl bg-[#141418] border border-apple-border/70 flex items-center justify-between group hover:border-apple-blue/40 transition-colors">
+          <div className="p-3 border-b border-[#EFE7E4] bg-[#FAF8F5]">
+            <div className="p-2.5 rounded-xl bg-[#FFFFFF] border border-[#EFE7E4] flex items-center justify-between group hover:border-[#DE9FAD] transition-colors shadow-sm">
               <div className="flex items-center space-x-2.5 min-w-0 flex-1">
-                <div className="w-7 h-7 rounded-lg bg-apple-blue/15 border border-apple-blue/30 flex items-center justify-center text-apple-blue-bright shrink-0">
+                <div className="w-7 h-7 rounded-lg bg-[#FDF5F6] border border-[#F6D9DE] flex items-center justify-center text-[#B76E79] shrink-0">
                   <Building2 className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0 flex-1 pr-1">
-                  <div className="text-xs font-semibold text-white truncate leading-tight">
+                  <div className="text-xs font-semibold text-apple-text truncate leading-tight">
                     {organization.name}
                   </div>
                   <div className="text-[10px] text-apple-text-secondary truncate mt-0.5">
@@ -169,7 +169,7 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
               <button
                 onClick={() => setIsOrgModalOpen(true)}
                 title="Edit Organization Name & Details"
-                className="p-1.5 rounded-lg text-apple-text-secondary hover:text-white hover:bg-[#1E1E24] transition-colors"
+                className="p-1.5 rounded-lg text-apple-text-secondary hover:text-[#B76E79] hover:bg-[#FAF4F3] transition-colors"
               >
                 <Edit3 className="w-3 h-3" />
               </button>
@@ -190,23 +190,23 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                   onClick={() => navigate(item.route)}
                   className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 ${
                     isActive
-                      ? "bg-[#18181B] text-white shadow-sm border border-apple-border/80"
-                      : "text-apple-text-secondary hover:text-white hover:bg-[#121214]"
+                      ? "bg-[#FDF5F6] text-[#B76E79] shadow-sm border border-[#F6D9DE] font-semibold"
+                      : "text-apple-text-secondary hover:text-apple-text hover:bg-[#FAF8F5]"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? "text-apple-blue-bright" : "text-apple-text-tertiary"}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? "text-[#B76E79]" : "text-apple-text-tertiary"}`} />
                   <span className="flex-1 text-left">{item.label}</span>
-                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-apple-blue-bright"></span>}
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#B76E79]"></span>}
                 </button>
               );
             })}
           </nav>
 
           {/* Database Indicator & Reset / Clear Controls */}
-          <div className="p-4 border-t border-[#1D1D20] bg-[#0A0A0C] space-y-2.5">
+          <div className="p-4 border-t border-[#EFE7E4] bg-[#FFFFFF] space-y-2.5">
             <div className="flex items-center justify-between text-xs text-apple-text-secondary pb-1">
               <span className="flex items-center space-x-2">
-                <Database className="w-3.5 h-3.5 text-apple-blue-bright" />
+                <Database className="w-3.5 h-3.5 text-[#B76E79]" />
                 <span className="font-mono text-[11px]">{dbMode}</span>
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-apple-green"></span>
@@ -227,7 +227,7 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                 onClick={handleSeed}
                 disabled={seeding}
                 title="Reload realistic 75-day dataset in INR"
-                className="apple-btn-secondary text-[10px] py-1.5 px-2 flex items-center justify-center space-x-1 text-apple-text-secondary hover:text-apple-blue-bright hover:border-apple-blue/40"
+                className="apple-btn-secondary text-[10px] py-1.5 px-2 flex items-center justify-center space-x-1 text-apple-text-secondary hover:text-[#B76E79] hover:border-[#DE9FAD]"
               >
                 <RefreshCw className={`w-3 h-3 shrink-0 ${seeding ? "animate-spin" : ""}`} />
                 <span>{seeding ? "Loading..." : "Demo Data"}</span>
@@ -237,18 +237,18 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
         </aside>
 
         {/* Mobile Header */}
-        <header className="md:hidden h-14 px-4 border-b border-[#1D1D20] bg-[#0A0A0C] flex items-center justify-between">
+        <header className="md:hidden h-14 px-4 border-b border-[#EFE7E4] bg-white/95 backdrop-blur-md flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
             <button onClick={() => navigate("/")} className="flex items-center space-x-2">
-              <div className="w-7 h-7 rounded-lg bg-[#141418] border border-apple-border/80 overflow-hidden flex items-center justify-center shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-[#FAF8F5] border border-[#EFE7E4] overflow-hidden flex items-center justify-center shrink-0">
                 <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
               </div>
             </button>
             <div className="flex items-center space-x-1.5">
-              <span className="font-semibold text-white text-xs truncate max-w-[140px]">
+              <span className="font-semibold text-apple-text text-xs truncate max-w-[140px]">
                 {organization.name}
               </span>
-              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#161618] border border-apple-border text-apple-blue-bright font-semibold">
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#FDF5F6] border border-[#F6D9DE] text-[#B76E79] font-semibold">
                 {organization.currency_symbol}
               </span>
             </div>
@@ -256,13 +256,13 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setIsOrgModalOpen(true)}
-              className="p-1.5 rounded-lg border border-apple-border text-apple-text-secondary text-xs"
+              className="p-1.5 rounded-lg border border-[#EFE7E4] text-apple-text-secondary hover:text-[#B76E79] text-xs bg-white"
             >
               <Edit3 className="w-4 h-4" />
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-lg border border-apple-border text-apple-text-secondary"
+              className="p-1.5 rounded-lg border border-[#EFE7E4] text-apple-text-secondary hover:text-[#B76E79] bg-white"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -271,10 +271,10 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
 
         {/* Mobile Nav Overlay */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-b border-[#1D1D20] bg-[#0A0A0C] p-4 space-y-1">
-            <div className="p-3 mb-2 rounded-xl bg-[#141418] border border-apple-border flex items-center justify-between">
+          <div className="md:hidden border-b border-[#EFE7E4] bg-white p-4 space-y-1">
+            <div className="p-3 mb-2 rounded-xl bg-[#FAF8F5] border border-[#EFE7E4] flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-white">{organization.name}</div>
+                <div className="text-xs font-semibold text-apple-text">{organization.name}</div>
                 <div className="text-[10px] text-apple-text-secondary">{organization.currency_symbol} {organization.currency}</div>
               </div>
               <button
@@ -282,7 +282,7 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                   setMobileMenuOpen(false);
                   setIsOrgModalOpen(true);
                 }}
-                className="text-xs text-apple-blue-bright underline"
+                className="text-xs text-[#B76E79] font-medium underline"
               >
                 Change Org
               </button>
@@ -298,7 +298,7 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                     setMobileMenuOpen(false);
                   }}
                   className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs ${
-                    isActive ? "bg-[#18181B] text-white font-medium" : "text-apple-text-secondary"
+                    isActive ? "bg-[#FDF5F6] text-[#B76E79] font-semibold border border-[#F6D9DE]" : "text-apple-text-secondary hover:text-apple-text"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -310,21 +310,21 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
         )}
 
         {/* Main Content Area with Ambient Lighting & Grid */}
-        <main className="flex-1 overflow-y-auto bg-[#080808] flex flex-col relative">
+        <main className="flex-1 overflow-y-auto bg-[#FAF8F5] flex flex-col relative">
           {/* Subtle Ambient Background Grid & Radial Spotlight */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-[0.18]"
+            className="absolute inset-0 pointer-events-none opacity-[0.4]"
             style={{
               backgroundImage: `
-                linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px)
+                linear-gradient(to right, rgba(183, 110, 121, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(183, 110, 121, 0.04) 1px, transparent 1px)
               `,
               backgroundSize: "48px 48px",
               maskImage: "radial-gradient(ellipse at 50% 10%, black 20%, transparent 75%)",
               WebkitMaskImage: "radial-gradient(ellipse at 50% 10%, black 20%, transparent 75%)",
             }}
           />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-apple-blue/5 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-[#B76E79]/5 rounded-full blur-[120px] pointer-events-none" />
 
           <div className="relative z-10 flex-1 flex flex-col">
             {children}
@@ -334,21 +334,21 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
 
       {/* Quick Edit Organization Modal */}
       {isOrgModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="apple-card p-6 md:p-8 max-w-md w-full border border-apple-border space-y-6 shadow-apple-elevated animate-fade-in">
-            <div className="flex items-center justify-between pb-3 border-b border-apple-border">
+        <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="apple-card p-6 md:p-8 max-w-md w-full border border-[#EFE7E4] space-y-6 shadow-apple-elevated animate-fade-in bg-white">
+            <div className="flex items-center justify-between pb-3 border-b border-[#EFE7E4]">
               <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-apple-blue/15 border border-apple-blue/30 flex items-center justify-center text-apple-blue-bright">
+                <div className="w-8 h-8 rounded-xl bg-[#FDF5F6] border border-[#F6D9DE] flex items-center justify-center text-[#B76E79]">
                   <Building2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-white tracking-tight">Organization Profile</h3>
+                  <h3 className="text-base font-semibold text-apple-text tracking-tight">Organization Profile</h3>
                   <p className="text-[11px] text-apple-text-secondary">Configure store identity and default currency</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsOrgModalOpen(false)}
-                className="text-apple-text-secondary hover:text-white p-1"
+                className="text-apple-text-secondary hover:text-apple-text p-1"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -365,7 +365,7 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                   value={orgForm.name}
                   onChange={(e) => setOrgForm({ ...orgForm, name: e.target.value })}
                   placeholder="e.g. Modi Electronics, Tata Retail, Sharma Stores"
-                  className="w-full p-2.5 bg-[#18181C] border border-apple-border rounded-xl text-white text-xs focus:outline-none focus:border-apple-blue"
+                  className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text text-xs focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                 />
               </div>
 
@@ -381,7 +381,7 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                       const sym = cur === "INR" ? "₹" : cur === "USD" ? "$" : cur === "EUR" ? "€" : "£";
                       setOrgForm({ ...orgForm, currency: cur, currency_symbol: sym });
                     }}
-                    className="w-full p-2.5 bg-[#18181C] border border-apple-border rounded-xl text-white text-xs focus:outline-none focus:border-apple-blue"
+                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text text-xs focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                   >
                     <option value="INR">INR (₹) Indian Rupee</option>
                     <option value="USD">USD ($) US Dollar</option>
@@ -399,7 +399,7 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                     value={orgForm.industry}
                     onChange={(e) => setOrgForm({ ...orgForm, industry: e.target.value })}
                     placeholder="e.g. Retail, Grocery, Hardware"
-                    className="w-full p-2.5 bg-[#18181C] border border-apple-border rounded-xl text-white text-xs focus:outline-none focus:border-apple-blue"
+                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text text-xs focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                   />
                 </div>
               </div>
@@ -413,7 +413,7 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                   value={orgForm.gstin}
                   onChange={(e) => setOrgForm({ ...orgForm, gstin: e.target.value.toUpperCase() })}
                   placeholder="e.g. 27AAACB2212R1Z0"
-                  className="w-full p-2.5 bg-[#18181C] border border-apple-border rounded-xl text-white font-mono text-xs focus:outline-none focus:border-apple-blue uppercase"
+                  className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono text-xs focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15 uppercase"
                 />
               </div>
 

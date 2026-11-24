@@ -109,14 +109,14 @@ export const SettingsPage: React.FC = () => {
   return (
     <div className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto w-full">
       {/* Header */}
-      <div className="pb-6 border-b border-[#1D1D20]">
-        <div className="flex items-center space-x-2 text-apple-blue-bright text-xs font-mono mb-1">
+      <div className="pb-6 border-b border-[#EFE7E4]">
+        <div className="flex items-center space-x-2 text-[#B76E79] text-xs font-mono mb-1 font-semibold">
           <Building2 className="w-3.5 h-3.5" />
           <span>{organization.name}</span>
           <span>•</span>
           <span>Default Currency: {organization.currency_symbol} {organization.currency}</span>
         </div>
-        <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
+        <h1 className="text-2xl md:text-3xl font-semibold text-apple-text tracking-tight">
           System Preferences & Organization
         </h1>
         <p className="text-xs md:text-sm text-apple-text-secondary mt-1">
@@ -126,7 +126,7 @@ export const SettingsPage: React.FC = () => {
 
       {feedbackMsg && (
         <div
-          className={`p-4 rounded-2xl text-xs flex items-center space-x-2.5 ${
+          className={`p-4 rounded-2xl text-xs flex items-center space-x-2.5 font-medium ${
             feedbackMsg.type === "success"
               ? "bg-apple-green/10 border border-apple-green/30 text-apple-green"
               : "bg-apple-red/10 border border-apple-red/30 text-apple-red"
@@ -138,13 +138,13 @@ export const SettingsPage: React.FC = () => {
       )}
 
       {/* Organization Setup Card */}
-      <div className="apple-card p-6 md:p-8 space-y-6">
-        <div className="flex items-center space-x-3 pb-4 border-b border-apple-border">
-          <div className="w-9 h-9 rounded-xl bg-apple-blue/15 border border-apple-blue/30 flex items-center justify-center text-apple-blue-bright">
+      <div className="apple-card p-6 md:p-8 space-y-6 bg-white border border-[#EFE7E4]">
+        <div className="flex items-center space-x-3 pb-4 border-b border-[#EFE7E4]">
+          <div className="w-9 h-9 rounded-xl bg-[#FDF5F6] border border-[#F6D9DE] flex items-center justify-center text-[#B76E79]">
             <Building2 className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-semibold text-base text-white tracking-tight">
+            <h3 className="font-semibold text-base text-apple-text tracking-tight">
               Organization & Business Profile
             </h3>
             <p className="text-xs text-apple-text-secondary">
@@ -165,7 +165,7 @@ export const SettingsPage: React.FC = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g. Modi Electronics, Tata Retail, Sharma Stores"
-                className="w-full p-3 bg-[#18181C] border border-apple-border rounded-xl text-white text-xs focus:outline-none focus:border-apple-blue"
+                className="w-full p-3 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text text-xs focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
               />
             </div>
 
@@ -180,7 +180,7 @@ export const SettingsPage: React.FC = () => {
                   const sym = cur === "INR" ? "₹" : cur === "USD" ? "$" : cur === "EUR" ? "€" : "£";
                   setFormData({ ...formData, currency: cur, currency_symbol: sym });
                 }}
-                className="w-full p-3 bg-[#18181C] border border-apple-border rounded-xl text-white text-xs focus:outline-none focus:border-apple-blue"
+                className="w-full p-3 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text text-xs focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
               >
                 <option value="INR">INR (₹) Indian Rupee</option>
                 <option value="USD">USD ($) US Dollar</option>
@@ -198,7 +198,7 @@ export const SettingsPage: React.FC = () => {
                 value={formData.industry}
                 onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
                 placeholder="e.g. Retail, Supermarket, Consumer Electronics, FMCG"
-                className="w-full p-3 bg-[#18181C] border border-apple-border rounded-xl text-white text-xs focus:outline-none focus:border-apple-blue"
+                className="w-full p-3 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text text-xs focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
               />
             </div>
 
@@ -211,7 +211,7 @@ export const SettingsPage: React.FC = () => {
                 value={formData.gstin}
                 onChange={(e) => setFormData({ ...formData, gstin: e.target.value.toUpperCase() })}
                 placeholder="e.g. 27AAACB2212R1Z0"
-                className="w-full p-3 bg-[#18181C] border border-apple-border rounded-xl text-white font-mono text-xs focus:outline-none focus:border-apple-blue uppercase"
+                className="w-full p-3 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono text-xs focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15 uppercase"
               />
             </div>
           </div>
@@ -231,37 +231,37 @@ export const SettingsPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Backend & DB Telemetry */}
-        <div className="apple-card p-6 md:p-8 space-y-5">
-          <div className="flex items-center space-x-2.5 pb-3 border-b border-apple-border">
-            <Server className="w-4 h-4 text-apple-blue-bright" />
-            <h3 className="font-semibold text-base text-white tracking-tight">
+        <div className="apple-card p-6 md:p-8 space-y-5 bg-white border border-[#EFE7E4]">
+          <div className="flex items-center space-x-2.5 pb-3 border-b border-[#EFE7E4]">
+            <Server className="w-4 h-4 text-[#B76E79]" />
+            <h3 className="font-semibold text-base text-apple-text tracking-tight">
               Backend Service Telemetry
             </h3>
           </div>
 
           <div className="space-y-3.5 font-mono text-xs">
-            <div className="flex justify-between py-1.5 border-b border-apple-border">
+            <div className="flex justify-between py-1.5 border-b border-[#EFE7E4]">
               <span className="text-apple-text-secondary">API Health Status:</span>
               <span className={`font-semibold ${health?.status === "ok" ? "text-apple-green" : "text-apple-red"}`}>
                 {health?.status || "Checking..."}
               </span>
             </div>
 
-            <div className="flex justify-between py-1.5 border-b border-apple-border">
+            <div className="flex justify-between py-1.5 border-b border-[#EFE7E4]">
               <span className="text-apple-text-secondary">Engine Version:</span>
-              <span className="text-white">{health?.version || "1.0.0"}</span>
+              <span className="text-apple-text">{health?.version || "1.0.0"}</span>
             </div>
 
-            <div className="flex justify-between py-1.5 border-b border-apple-border">
+            <div className="flex justify-between py-1.5 border-b border-[#EFE7E4]">
               <span className="text-apple-text-secondary">Active Storage Engine:</span>
-              <span className="text-apple-blue-bright font-semibold">
+              <span className="text-[#B76E79] font-semibold">
                 {health?.database?.mode === "atlas" ? "MongoDB Atlas (Cloud Cluster)" : "High-Performance In-Memory Engine"}
               </span>
             </div>
 
-            <div className="flex justify-between py-1.5 border-b border-apple-border">
+            <div className="flex justify-between py-1.5 border-b border-[#EFE7E4]">
               <span className="text-apple-text-secondary">Active Currency:</span>
-              <span className="text-white font-semibold">{organization.currency_symbol} {organization.currency}</span>
+              <span className="text-apple-text font-semibold">{organization.currency_symbol} {organization.currency}</span>
             </div>
           </div>
 
@@ -270,17 +270,17 @@ export const SettingsPage: React.FC = () => {
             disabled={loading}
             className="w-full apple-btn-secondary text-xs py-2.5 flex items-center justify-center space-x-2"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-apple-blue-bright" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-[#B76E79]" : ""}`} />
             <span>Re-verify Connection</span>
           </button>
         </div>
 
         {/* Catalog & Sandbox Controls */}
-        <div className="apple-card p-6 md:p-8 space-y-5 flex flex-col justify-between">
+        <div className="apple-card p-6 md:p-8 space-y-5 flex flex-col justify-between bg-white border border-[#EFE7E4]">
           <div className="space-y-4">
-            <div className="flex items-center space-x-2.5 pb-3 border-b border-apple-border">
-              <Database className="w-4 h-4 text-apple-blue-bright" />
-              <h3 className="font-semibold text-base text-white tracking-tight">
+            <div className="flex items-center space-x-2.5 pb-3 border-b border-[#EFE7E4]">
+              <Database className="w-4 h-4 text-[#B76E79]" />
+              <h3 className="font-semibold text-base text-apple-text tracking-tight">
                 Catalog & Dataset Controls
               </h3>
             </div>
@@ -289,7 +289,7 @@ export const SettingsPage: React.FC = () => {
               Choose between entering your own custom inventory products or loading realistic sample data priced in Indian Rupees (₹).
             </p>
 
-            <div className="p-4 bg-[#18181C] rounded-xl border border-apple-border text-[11px] font-mono text-apple-text-secondary space-y-1.5">
+            <div className="p-4 bg-[#FAF8F5] rounded-xl border border-[#EFE7E4] text-[11px] font-mono text-apple-text-secondary space-y-1.5">
               <div>· Option A: Clear all sample data and start fresh with your own SKUs</div>
               <div>· Option B: Load 10 pre-configured multi-category SKUs in ₹ INR</div>
               <div>· 75-Day multi-channel sales history with cyclical demand</div>
