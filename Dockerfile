@@ -8,11 +8,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install python dependencies
-COPY backend/requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend source
-COPY backend/ ./backend/
+# Copy all application files
+COPY . .
 
 ENV HOST=0.0.0.0
 ENV PORT=8000
@@ -20,4 +20,4 @@ ENV ENVIRONMENT=production
 
 EXPOSE 8000
 
-CMD ["python", "backend/run.py"]
+CMD ["python", "main.py"]

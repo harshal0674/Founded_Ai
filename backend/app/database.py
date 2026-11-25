@@ -176,6 +176,26 @@ class InMemoryCollection:
                 self.modified_count = mod
         return UpdateResult(matched, modified)
 
+    async def update_many(self, filter_doc: Dict[str, Any], update_doc: Dict[str, Any]):
+        matched = 0
+        modified = 0
+        for doc_id, doc in self.docs.items():
+            if self._matches_filter(doc, filter_doc):
+                matched += 1
+                if "$set" in update_doc:
+                    for k, v in update_doc["$set"].items():
+                        doc[k] = v
+                    modified += 1
+                if "$inc" in update_doc:
+                    for k, v in update_doc["$inc"].items():
+                        doc[k] = doc.get(k, 0) + v
+                    modified += 1
+        class UpdateResult:
+            def __init__(self, m, mod):
+                self.matched_count = m
+                self.modified_count = mod
+        return UpdateResult(matched, modified)
+
     async def delete_one(self, filter_doc: Dict[str, Any]):
         del_count = 0
         for doc_id, doc in list(self.docs.items()):
