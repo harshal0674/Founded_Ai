@@ -1,18 +1,21 @@
-from fastapi import APIRouter
+from typing import Any, Dict
+from fastapi import APIRouter, Depends
 from backend.app.models.recommendation import RecommendationOverview, RecommendationResponse
 from backend.app.services.inventory_service import InventoryService
 from backend.app.services.replenishment_service import ReplenishmentService
 from backend.app.services.sales_service import SalesService
+from backend.app.utils.auth import get_current_tenant
 
 router = APIRouter(prefix="/recommendations", tags=["Recommendations"])
 
 @router.get("", response_model=RecommendationOverview)
-async def get_replenishment_recommendations():
-    products = await InventoryService.list_products()
+async def get_replenishment_recommendations(tenant: Dict[str, Any] = Depends(get_current_tenant)):
+    org_id = tenant.get("org_id")
+    products = await InventoryService.list_products(org_id=org_id)
     items = []
 
     for prod in products:
-        sales = await SalesService.get_sales_for_product(prod["id"])
+        sales = await SalesService.get_sales_for_product(prod["id"], org_id=org_id)
         rec = ReplenishmentService.calculate_recommendation(prod, sales)
         items.append(RecommendationResponse(**rec))
 

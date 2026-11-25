@@ -5,8 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from backend.app.config import settings
 from backend.app.database import db_manager
-from backend.app.routes import dashboard, forecast, health, products, recommendations, sales, system
-from backend.app.utils.seed_data import seed_database
+from backend.app.routes import auth, dashboard, forecast, health, products, recommendations, sales, system
+from backend.app.utils.seed_data import ensure_demo_accounts, seed_database
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("stockmind")
@@ -16,6 +16,12 @@ async def lifespan(app: FastAPI):
     # Startup: Connect to DB
     logger.info("Starting up StockMind AI Engine...")
     await db_manager.connect()
+    
+    # Ensure standard customer accounts (Gada Electronics & Bharat Retail) exist
+    try:
+        await ensure_demo_accounts()
+    except Exception as e:
+        logger.warning(f"Could not verify demo accounts on startup: {e}")
     
     # Auto-seed initial demo dataset only if brand new database without custom preference
     settings_col = db_manager.get_collection("system_settings")
@@ -59,6 +65,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 # Include routers
 app.include_router(health.router)
+app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 app.include_router(products.router, prefix=settings.API_V1_PREFIX)
 app.include_router(sales.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dashboard.router, prefix=settings.API_V1_PREFIX)

@@ -83,7 +83,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ navigate }) => {
 
         <div className="flex items-center space-x-3">
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/login")}
             className="hidden sm:inline-flex text-xs text-apple-text-secondary hover:text-[#B76E79] px-3 py-1.5 transition-colors font-medium"
           >
             Sign In

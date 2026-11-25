@@ -1,13 +1,16 @@
 import {
+  AuthResponse,
   DashboardCharts,
   DashboardStats,
+  DemoAccount,
   OrganizationProfile,
   Product,
   ProductCreate,
   ProductForecast,
   RecommendationOverview,
   Sale,
-  SaleCreate
+  SaleCreate,
+  User
 } from "../types";
 
 const RAW_API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
@@ -15,16 +18,34 @@ const API_BASE = RAW_API_URL.endsWith("/") ? RAW_API_URL.slice(0, -1) : RAW_API_
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+  
+  // Attach JWT Bearer token if present
+  const token = localStorage.getItem("stockmind_token");
+  const authHeaders: Record<string, string> = {};
+  if (token) {
+    authHeaders["Authorization"] = `Bearer ${token}`;
+  }
+
   try {
     const res = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
+        ...authHeaders,
         ...options?.headers,
       },
       ...options,
     });
 
     if (!res.ok) {
+      if (res.status === 401) {
+        // If unauthorized on protected endpoint, clear stale token and notify
+        if (!endpoint.includes("/auth/login") && !endpoint.includes("/auth/register")) {
+          localStorage.removeItem("stockmind_token");
+          localStorage.removeItem("stockmind_user");
+          window.dispatchEvent(new CustomEvent("stockmind:unauthorized"));
+        }
+      }
+
       let errDetail = `HTTP ${res.status}: ${res.statusText}`;
       try {
         const errJson = await res.json();
@@ -45,6 +66,31 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  // Auth & Multi-Tenancy
+  login: (data: { email: string; password: string }) =>
+    request<AuthResponse>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  register: (data: {
+    full_name: string;
+    business_name: string;
+    email: string;
+    password: string;
+    currency?: string;
+    currency_symbol?: string;
+    industry?: string;
+  }) =>
+    request<AuthResponse>("/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  getMe: () => request<AuthResponse>("/api/auth/me"),
+
+  getDemoAccounts: () => request<DemoAccount[]>("/api/auth/demo-accounts"),
+
   // Health
   checkHealth: () => request<{ status: string; database: { connected: boolean; mode: string } }>("/health"),
 

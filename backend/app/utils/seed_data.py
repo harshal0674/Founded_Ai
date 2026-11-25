@@ -1,7 +1,8 @@
 import random
 from datetime import datetime, timedelta, timezone
-from typing import Dict, List
+from typing import Dict, List, Optional
 from backend.app.database import db_manager
+from backend.app.utils.auth import hash_password
 
 DEMO_PRODUCTS = [
     {
@@ -59,9 +60,9 @@ DEMO_PRODUCTS = [
         "current_stock": 0,
         "min_stock_level": 15,
         "unit_cost": 1200.00,
-        "selling_price": 2499.00,
+        "selling_price": 2850.00,
         "lead_time_days": 12,
-        "supplier_name": "SafeStatic Enterprises (Chennai)",
+        "supplier_name": "SafeStatic Tech (Chennai)",
         "supplier_email": "repairs@safestatic.example"
     },
     {
@@ -126,21 +127,136 @@ DEMO_PRODUCTS = [
     }
 ]
 
-async def seed_database(clear_existing: bool = True) -> Dict[str, int]:
-    """Populates realistic products and 60-90 days of historical sales."""
+async def ensure_demo_accounts():
+    """Seeds default customer tenant accounts for instant 1-click login and testing."""
+    users_col = db_manager.get_collection("users")
+    orgs_col = db_manager.get_collection("organizations")
+    prod_col = db_manager.get_collection("products")
+
+    # 1. Gada Electronics
+    gada_org = await orgs_col.find_one({"_id": "org_gada_electronics"})
+    if not gada_org:
+        await orgs_col.insert_one({
+            "_id": "org_gada_electronics",
+            "id": "org_gada_electronics",
+            "name": "Gada Electronics",
+            "currency": "INR",
+            "currency_symbol": "₹",
+            "industry": "Electronics & Gadgets",
+            "gstin": "27AAACB2212R1Z0",
+            "address": "Powai, Mumbai, Maharashtra",
+            "phone": "+91 98200 12345"
+        })
+
+    gada_user = await users_col.find_one({"email": "gada@electronics.in"})
+    if not gada_user:
+        await users_col.insert_one({
+            "_id": "usr_gada_001",
+            "id": "usr_gada_001",
+            "email": "gada@electronics.in",
+            "hashed_password": hash_password("password123"),
+            "full_name": "Jethalal Gada",
+            "org_id": "org_gada_electronics",
+            "role": "owner",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+
+    # Stamp any existing legacy products without org_id to Gada Electronics
+    await prod_col.update_many(
+        {"$or": [{"org_id": {"$exists": False}}, {"org_id": None}]},
+        {"$set": {"org_id": "org_gada_electronics"}}
+    )
+
+    # 2. Bharat Retail Corp
+    bharat_org = await orgs_col.find_one({"_id": "org_bharat_retail"})
+    if not bharat_org:
+        await orgs_col.insert_one({
+            "_id": "org_bharat_retail",
+            "id": "org_bharat_retail",
+            "name": "Bharat Retail Corp",
+            "currency": "INR",
+            "currency_symbol": "₹",
+            "industry": "Supermarket & FMCG Goods",
+            "gstin": "07AAACB9999R1Z1",
+            "address": "Connaught Place, New Delhi",
+            "phone": "+91 98111 54321"
+        })
+
+    bharat_user = await users_col.find_one({"email": "bharat@retail.in"})
+    if not bharat_user:
+        await users_col.insert_one({
+            "_id": "usr_bharat_001",
+            "id": "usr_bharat_001",
+            "email": "bharat@retail.in",
+            "hashed_password": hash_password("password123"),
+            "full_name": "Ramesh Kumar",
+            "org_id": "org_bharat_retail",
+            "role": "owner",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+
+    # Seed FMCG sample products for Bharat Retail Corp if none exist
+    bharat_count = await prod_col.count_documents({"org_id": "org_bharat_retail"})
+    if bharat_count == 0:
+        fmcg_products = [
+            {
+                "name": "Organic Royal Basmati Rice (5kg)",
+                "sku": "RICE-BAS-005",
+                "category": "Grains & Staples",
+                "current_stock": 140,
+                "min_stock_level": 35,
+                "unit_cost": 450.00,
+                "selling_price": 799.00,
+                "lead_time_days": 4,
+                "supplier_name": "Punjab Agro Mills",
+                "supplier_email": "supply@punjabagro.example",
+                "org_id": "org_bharat_retail"
+            },
+            {
+                "name": "Assam CTC Premium Tea (1kg)",
+                "sku": "TEA-ASM-001",
+                "category": "Beverages",
+                "current_stock": 85,
+                "min_stock_level": 25,
+                "unit_cost": 320.00,
+                "selling_price": 549.00,
+                "lead_time_days": 5,
+                "supplier_name": "Guwahati Tea Estates",
+                "supplier_email": "orders@guwahatitea.example",
+                "org_id": "org_bharat_retail"
+            },
+            {
+                "name": "Cold-Pressed Mustard Oil (5L Jar)",
+                "sku": "OIL-MST-005",
+                "category": "Edible Oils",
+                "current_stock": 12,
+                "min_stock_level": 30,
+                "unit_cost": 680.00,
+                "selling_price": 1099.00,
+                "lead_time_days": 6,
+                "supplier_name": "Rajasthan Oil Mills",
+                "supplier_email": "orders@rajasthanoils.example",
+                "org_id": "org_bharat_retail"
+            }
+        ]
+        now = datetime.now(timezone.utc)
+        for p in fmcg_products:
+            p["created_at"] = now
+            p["updated_at"] = now
+            await prod_col.insert_one(p)
+
+async def seed_database(clear_existing: bool = True, org_id: Optional[str] = None) -> Dict[str, int]:
+    """Populates realistic products and 60-90 days of historical sales for an organization."""
     prod_col = db_manager.get_collection("products")
     sales_col = db_manager.get_collection("sales")
     movements_col = db_manager.get_collection("inventory_movements")
+    target_org = org_id or "org_gada_electronics"
 
     if clear_existing:
-        await prod_col.delete_many({})
-        await sales_col.delete_many({})
-        await movements_col.delete_many({})
-
-    # Check if already seeded
-    existing_count = await prod_col.count_documents({})
-    if existing_count > 0 and not clear_existing:
-        return {"products": existing_count, "sales": await sales_col.count_documents({})}
+        filter_q = {"org_id": target_org}
+        await prod_col.delete_many(filter_q)
+        await sales_col.delete_many(filter_q)
+        await movements_col.delete_many(filter_q)
 
     now = datetime.now(timezone.utc)
     seeded_products = []
@@ -148,6 +264,7 @@ async def seed_database(clear_existing: bool = True) -> Dict[str, int]:
     # 1. Insert Products
     for item in DEMO_PRODUCTS:
         doc = dict(item)
+        doc["org_id"] = target_org
         doc["created_at"] = now - timedelta(days=90)
         doc["updated_at"] = now
         res = await prod_col.insert_one(doc)
@@ -155,7 +272,7 @@ async def seed_database(clear_existing: bool = True) -> Dict[str, int]:
         seeded_products.append(doc)
 
     # 2. Generate 75 days of realistic historical sales
-    random.seed(42)  # Deterministic seed for reproducible testing
+    random.seed(42)
     sales_docs = []
     customer_types = ["retail", "online", "wholesale"]
 
@@ -169,22 +286,18 @@ async def seed_database(clear_existing: bool = True) -> Dict[str, int]:
             "Office Tech": 2.2
         }.get(prod["category"], 4.0)
 
-        # Iterate over past 75 days
         for day_offset in range(75, 0, -1):
             sale_date = now - timedelta(days=day_offset, hours=random.randint(1, 18), minutes=random.randint(0, 59))
             day_of_week = sale_date.weekday()
             
-            # Weekend bump for consumer tech, weekday bump for packaging/industrial
             weekend_factor = 1.3 if day_of_week >= 5 else 0.9
             if prod["category"] in ["Industrial Sensors", "Packaging"]:
                 weekend_factor = 0.6 if day_of_week >= 5 else 1.2
 
-            # Random daily variation with Poisson/normal distribution
             noise = random.gauss(0, 1.2)
             daily_qty = max(0, int(round(base_demand * weekend_factor + noise)))
             
             if daily_qty > 0:
-                # Distribute into 1 to 3 distinct sales orders
                 orders_count = random.randint(1, min(3, daily_qty))
                 remaining = daily_qty
                 for o_idx in range(orders_count):
@@ -202,6 +315,7 @@ async def seed_database(clear_existing: bool = True) -> Dict[str, int]:
                         "product_id": prod_id,
                         "product_name": prod["name"],
                         "sku": prod["sku"],
+                        "org_id": target_org,
                         "quantity": qty,
                         "unit_price": unit_price,
                         "total_price": round(unit_price * qty, 2),

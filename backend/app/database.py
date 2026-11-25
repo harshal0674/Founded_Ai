@@ -16,15 +16,25 @@ class InMemoryCollection:
     def _matches_filter(self, doc: Dict[str, Any], filter_doc: Dict[str, Any]) -> bool:
         if not filter_doc:
             return True
+        if "$or" in filter_doc:
+            if not any(self._matches_filter(doc, cond) for cond in filter_doc["$or"]):
+                return False
         for key, expected in filter_doc.items():
+            if key == "$or":
+                continue
             if key == "_id":
                 if str(doc.get("_id")) != str(expected):
                     return False
             elif isinstance(expected, dict):
-                # Handle operators like $in, $gte, $lte, $gt, $lt, $ne
+                # Handle operators like $in, $gte, $lte, $gt, $lt, $ne, $exists
                 val = doc.get(key)
                 for op, op_val in expected.items():
-                    if op == "$in" and val not in op_val:
+                    if op == "$exists":
+                        if op_val and key not in doc:
+                            return False
+                        elif not op_val and key in doc:
+                            return False
+                    elif op == "$in" and val not in op_val:
                         return False
                     elif op == "$ne" and val == op_val:
                         return False

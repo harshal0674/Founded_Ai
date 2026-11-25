@@ -38,22 +38,35 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   });
   const [loading, setLoading] = useState(true);
 
-  // Sync from backend on mount
+  // Sync from backend on mount and whenever active customer switches
   useEffect(() => {
-    api.getOrganization()
-      .then((data) => {
-        if (data && data.name) {
-          setOrganization((prev) => {
-            const merged = { ...prev, ...data };
-            localStorage.setItem("stockmind_org", JSON.stringify(merged));
-            return merged;
-          });
-        }
-      })
-      .catch((err) => {
-        console.warn("Could not sync organization from server, using local state:", err);
-      })
-      .finally(() => setLoading(false));
+    const syncOrg = () => {
+      api.getOrganization()
+        .then((data) => {
+          if (data && data.name) {
+            setOrganization(data);
+            localStorage.setItem("stockmind_org", JSON.stringify(data));
+          }
+        })
+        .catch((err) => {
+          console.warn("Could not sync organization from server, using local state:", err);
+        })
+        .finally(() => setLoading(false));
+    };
+
+    syncOrg();
+
+    const handleOrgRefresh = () => syncOrg();
+    const handleLogout = () => {
+      setOrganization(DEFAULT_ORGANIZATION);
+    };
+
+    window.addEventListener("stockmind:refresh", handleOrgRefresh);
+    window.addEventListener("stockmind:logout", handleLogout);
+    return () => {
+      window.removeEventListener("stockmind:refresh", handleOrgRefresh);
+      window.removeEventListener("stockmind:logout", handleLogout);
+    };
   }, []);
 
   const updateOrganization = async (updates: Partial<OrganizationProfile>) => {

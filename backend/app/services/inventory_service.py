@@ -32,10 +32,17 @@ class InventoryService:
         search: Optional[str] = None,
         category: Optional[str] = None,
         status: Optional[str] = None,
-        low_stock_only: bool = False
+        low_stock_only: bool = False,
+        org_id: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         collection = db_manager.get_collection("products")
         filter_doc: Dict[str, Any] = {}
+
+        if org_id:
+            if org_id in ("org_gada_electronics", "org_default"):
+                filter_doc["$or"] = [{"org_id": org_id}, {"org_id": {"$exists": False}}, {"org_id": None}]
+            else:
+                filter_doc["org_id"] = org_id
 
         if category and category.lower() != "all":
             filter_doc["category"] = category
@@ -63,9 +70,8 @@ class InventoryService:
         return results
 
     @classmethod
-    async def get_product(cls, product_id: str) -> Dict[str, Any]:
+    async def get_product(cls, product_id: str, org_id: Optional[str] = None) -> Dict[str, Any]:
         collection = db_manager.get_collection("products")
-        # Try finding by ObjectId or by string id
         doc = None
         try:
             doc = await collection.find_one({"_id": ObjectId(product_id)})
@@ -78,19 +84,31 @@ class InventoryService:
 
         if not doc:
             raise HTTPException(status_code=404, detail=f"Product with ID '{product_id}' not found.")
+        
+        if org_id and doc.get("org_id") and org_id not in ("org_gada_electronics", "org_default") and doc.get("org_id") != org_id:
+            raise HTTPException(status_code=404, detail=f"Product with ID '{product_id}' not found.")
+
         return cls._format_doc(doc)
 
     @classmethod
-    async def create_product(cls, payload: ProductCreate) -> Dict[str, Any]:
+    async def create_product(cls, payload: ProductCreate, org_id: Optional[str] = None) -> Dict[str, Any]:
         collection = db_manager.get_collection("products")
+        target_org = org_id or "org_gada_electronics"
         
-        # Check SKU uniqueness
-        existing = await collection.find_one({"sku": payload.sku})
+        # Check SKU uniqueness within this tenant
+        sku_filter = {"sku": payload.sku}
+        if target_org in ("org_gada_electronics", "org_default"):
+            sku_filter["$or"] = [{"org_id": target_org}, {"org_id": {"$exists": False}}, {"org_id": None}]
+        else:
+            sku_filter["org_id"] = target_org
+
+        existing = await collection.find_one(sku_filter)
         if existing:
-            raise HTTPException(status_code=400, detail=f"A product with SKU '{payload.sku}' already exists.")
+            raise HTTPException(status_code=400, detail=f"A product with SKU '{payload.sku}' already exists in your inventory.")
 
         now = datetime.now(timezone.utc)
         doc = payload.model_dump()
+        doc["org_id"] = target_org
         doc["created_at"] = now
         doc["updated_at"] = now
         
@@ -99,9 +117,9 @@ class InventoryService:
         return cls._format_doc(doc)
 
     @classmethod
-    async def update_product(cls, product_id: str, payload: ProductUpdate) -> Dict[str, Any]:
+    async def update_product(cls, product_id: str, payload: ProductUpdate, org_id: Optional[str] = None) -> Dict[str, Any]:
         collection = db_manager.get_collection("products")
-        existing = await cls.get_product(product_id)
+        existing = await cls.get_product(product_id, org_id=org_id)
 
         update_dict = {k: v for k, v in payload.model_dump(exclude_unset=True).items() if v is not None}
         if not update_dict:
@@ -111,18 +129,25 @@ class InventoryService:
         
         # Check SKU uniqueness if changing SKU
         if "sku" in update_dict and update_dict["sku"] != existing["sku"]:
-            conflict = await collection.find_one({"sku": update_dict["sku"]})
+            target_org = org_id or existing.get("org_id", "org_gada_electronics")
+            sku_filter = {"sku": update_dict["sku"]}
+            if target_org in ("org_gada_electronics", "org_default"):
+                sku_filter["$or"] = [{"org_id": target_org}, {"org_id": {"$exists": False}}, {"org_id": None}]
+            else:
+                sku_filter["org_id"] = target_org
+            conflict = await collection.find_one(sku_filter)
             if conflict and str(conflict.get("_id")) != product_id:
                 raise HTTPException(status_code=400, detail=f"SKU '{update_dict['sku']}' is already in use.")
 
         target_id = ObjectId(product_id) if ObjectId.is_valid(product_id) else product_id
         await collection.update_one({"_id": target_id}, {"$set": update_dict})
         
-        return await cls.get_product(product_id)
+        return await cls.get_product(product_id, org_id=org_id)
 
     @classmethod
-    async def delete_product(cls, product_id: str) -> bool:
+    async def delete_product(cls, product_id: str, org_id: Optional[str] = None) -> bool:
         collection = db_manager.get_collection("products")
+        await cls.get_product(product_id, org_id=org_id)
         target_id = ObjectId(product_id) if ObjectId.is_valid(product_id) else product_id
         res = await collection.delete_one({"_id": target_id})
         if res.deleted_count == 0:
@@ -130,12 +155,12 @@ class InventoryService:
         return True
 
     @classmethod
-    async def deduct_stock(cls, product_id: str, quantity: int) -> Dict[str, Any]:
+    async def deduct_stock(cls, product_id: str, quantity: int, org_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Atomically decrements stock and guarantees non-negative inventory.
         """
         collection = db_manager.get_collection("products")
-        product = await cls.get_product(product_id)
+        product = await cls.get_product(product_id, org_id=org_id)
         current_stock = product.get("current_stock", 0)
 
         if current_stock < quantity:
@@ -162,18 +187,19 @@ class InventoryService:
         await movements_col.insert_one({
             "product_id": product_id,
             "sku": product["sku"],
+            "org_id": org_id or product.get("org_id", "org_gada_electronics"),
             "type": "sale_deduction",
             "quantity_delta": -quantity,
             "resulting_stock": new_stock,
             "timestamp": datetime.now(timezone.utc)
         })
 
-        return await cls.get_product(product_id)
+        return await cls.get_product(product_id, org_id=org_id)
 
     @classmethod
-    async def restock_product(cls, product_id: str, quantity: int) -> Dict[str, Any]:
+    async def restock_product(cls, product_id: str, quantity: int, org_id: Optional[str] = None) -> Dict[str, Any]:
         collection = db_manager.get_collection("products")
-        product = await cls.get_product(product_id)
+        product = await cls.get_product(product_id, org_id=org_id)
         new_stock = product.get("current_stock", 0) + quantity
         target_id = ObjectId(product_id) if ObjectId.is_valid(product_id) else product_id
 
@@ -191,10 +217,11 @@ class InventoryService:
         await movements_col.insert_one({
             "product_id": product_id,
             "sku": product["sku"],
+            "org_id": org_id or product.get("org_id", "org_gada_electronics"),
             "type": "restock_replenishment",
             "quantity_delta": quantity,
             "resulting_stock": new_stock,
             "timestamp": datetime.now(timezone.utc)
         })
 
-        return await cls.get_product(product_id)
+        return await cls.get_product(product_id, org_id=org_id)

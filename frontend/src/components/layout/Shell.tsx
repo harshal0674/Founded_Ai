@@ -15,10 +15,13 @@ import {
   Edit3,
   Trash2,
   Check,
-  Plus
+  Plus,
+  LogOut,
+  User
 } from "lucide-react";
 import { api } from "../../api/client";
 import { useOrganization } from "../../context/OrganizationContext";
+import { useAuth } from "../../context/AuthContext";
 
 interface ShellProps {
   currentRoute: string;
@@ -28,6 +31,7 @@ interface ShellProps {
 
 export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }) => {
   const { organization, updateOrganization, clearCatalog, reloadDemoData } = useOrganization();
+  const { user, logout } = useAuth();
   const [dbMode, setDbMode] = useState<string>("connecting...");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [seeding, setSeeding] = useState(false);
@@ -233,6 +237,28 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                 <span>{seeding ? "Loading..." : "Demo Data"}</span>
               </button>
             </div>
+
+            {/* User Account & Logout Footer */}
+            <div className="pt-2 border-t border-[#EFE7E4] flex items-center justify-between">
+              <div className="min-w-0 flex-1 pr-2">
+                <span className="text-[11px] font-semibold text-apple-text block truncate leading-tight">
+                  {user?.full_name || organization.name}
+                </span>
+                <span className="text-[10px] text-apple-text-tertiary font-mono block truncate mt-0.5">
+                  {user?.email || "owner@store.in"}
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  logout();
+                  navigate("/login");
+                }}
+                title="Sign Out / Switch Customer Account"
+                className="p-1.5 rounded-lg text-apple-text-secondary hover:text-apple-red hover:bg-[#FAF4F3] transition-colors shrink-0"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </aside>
 
@@ -306,6 +332,20 @@ export const Shell: React.FC<ShellProps> = ({ currentRoute, navigate, children }
                 </button>
               );
             })}
+
+            <div className="pt-2 border-t border-[#EFE7E4] mt-2">
+              <button
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                  navigate("/login");
+                }}
+                className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs text-apple-red hover:bg-apple-red/5 font-medium transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out ({user?.email || organization.name})</span>
+              </button>
+            </div>
           </div>
         )}
 

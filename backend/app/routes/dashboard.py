@@ -1,16 +1,18 @@
 from datetime import datetime, timedelta, timezone
-from typing import Dict, List
-from fastapi import APIRouter
+from typing import Any, Dict, List
+from fastapi import APIRouter, Depends
 from backend.app.services.inventory_service import InventoryService
 from backend.app.services.replenishment_service import ReplenishmentService
 from backend.app.services.sales_service import SalesService
+from backend.app.utils.auth import get_current_tenant
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
 @router.get("/stats")
-async def get_dashboard_stats():
-    products = await InventoryService.list_products()
-    all_sales = await SalesService.get_all_sales_time_series()
+async def get_dashboard_stats(tenant: Dict[str, Any] = Depends(get_current_tenant)):
+    org_id = tenant.get("org_id")
+    products = await InventoryService.list_products(org_id=org_id)
+    all_sales = await SalesService.get_all_sales_time_series(org_id=org_id)
     
     total_products = len(products)
     total_stock_value = round(sum(p["total_value"] for p in products), 2)
@@ -62,9 +64,10 @@ async def get_dashboard_stats():
     }
 
 @router.get("/charts")
-async def get_dashboard_charts():
-    products = await InventoryService.list_products()
-    all_sales = await SalesService.get_all_sales_time_series()
+async def get_dashboard_charts(tenant: Dict[str, Any] = Depends(get_current_tenant)):
+    org_id = tenant.get("org_id")
+    products = await InventoryService.list_products(org_id=org_id)
+    all_sales = await SalesService.get_all_sales_time_series(org_id=org_id)
 
     # 1. 30-Day Sales & Revenue Trend
     now = datetime.now(timezone.utc)

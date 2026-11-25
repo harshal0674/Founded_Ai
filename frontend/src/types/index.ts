@@ -166,3 +166,30 @@ export interface OrganizationProfile {
   address?: string;
   phone?: string;
 }
+
+export interface User {
+  id: string;
+  email: string;
+  full_name: string;
+  org_id: string;
+  org_name: string;
+  role?: string;
+  created_at?: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  user: User;
+  organization: OrganizationProfile;
+}
+
+export interface DemoAccount {
+  name: string;
+  email: string;
+  password: string;
+  owner: string;
+  industry: string;
+  currency: string;
+  description: string;
+}

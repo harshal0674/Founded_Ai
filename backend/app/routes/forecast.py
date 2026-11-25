@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
-from typing import Optional
-from fastapi import APIRouter, HTTPException, Query
+from typing import Any, Dict, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from backend.app.ml.forecaster import DemandForecaster
 from backend.app.models.forecast import ProductForecastResponse
 from backend.app.services.inventory_service import InventoryService
 from backend.app.services.sales_service import SalesService
+from backend.app.utils.auth import get_current_tenant
 
 router = APIRouter(prefix="/forecast", tags=["Forecasting"])
 
@@ -16,11 +17,13 @@ class ForecastRequest(BaseModel):
 @router.get("", response_model=ProductForecastResponse)
 async def get_forecast(
     product_id: Optional[str] = Query(None, description="Product ID to forecast. If empty, selects first active product."),
-    horizon_days: int = Query(30, ge=7, le=90)
+    horizon_days: int = Query(30, ge=7, le=90),
+    tenant: Dict[str, Any] = Depends(get_current_tenant)
 ):
-    products = await InventoryService.list_products()
+    org_id = tenant.get("org_id")
+    products = await InventoryService.list_products(org_id=org_id)
     if not products:
-        raise HTTPException(status_code=404, detail="No products exist in database to forecast.")
+        raise HTTPException(status_code=404, detail="No products exist in your inventory to forecast. Add a product first.")
 
     target_product = None
     if product_id:
@@ -29,12 +32,12 @@ async def get_forecast(
                 target_product = p
                 break
         if not target_product:
-            target_product = await InventoryService.get_product(product_id)
+            target_product = await InventoryService.get_product(product_id, org_id=org_id)
     else:
         target_product = products[0]
 
     # Retrieve sales history
-    sales = await SalesService.get_sales_for_product(target_product["id"])
+    sales = await SalesService.get_sales_for_product(target_product["id"], org_id=org_id)
     
     # Run ML Forecaster
     res = DemandForecaster.forecast_product_demand(sales, horizon_days=horizon_days)
@@ -60,7 +63,3 @@ async def get_forecast(
         "forecast": res["forecast"],
         "generated_at": datetime.now(timezone.utc).isoformat()
     }
-
-@router.post("", response_model=ProductForecastResponse)
-async def generate_forecast_post(payload: ForecastRequest):
-    return await get_forecast(product_id=payload.product_id, horizon_days=payload.horizon_days)
