@@ -13,7 +13,9 @@ import {
   User
 } from "../types";
 
-const RAW_API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const RAW_API_URL = import.meta.env.VITE_API_BASE_URL !== undefined
+  ? import.meta.env.VITE_API_BASE_URL
+  : (import.meta.env.PROD ? "" : "http://localhost:8000");
 const API_BASE = RAW_API_URL.endsWith("/") ? RAW_API_URL.slice(0, -1) : RAW_API_URL;
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {

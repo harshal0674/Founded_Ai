@@ -25,11 +25,14 @@ class Settings:
     MONGODB_URI: str = os.getenv("MONGODB_URI", "")
     MONGODB_DB_NAME: str = os.getenv("MONGODB_DB_NAME", "stockmind_db")
     
-    # CORS
+    # CORS & Internal Service Bindings
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "")
     CORS_ORIGINS: List[str] = [
-        origin.strip() for origin in os.getenv(
-            "CORS_ORIGINS", 
-            "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,https://stockmind-ai.vercel.app"
+        origin.strip() for origin in (
+            os.getenv(
+                "CORS_ORIGINS", 
+                "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,https://stockmind-ai.vercel.app"
+            ) + (f",{os.getenv('FRONTEND_URL')}" if os.getenv("FRONTEND_URL") else "")
         ).split(",") if origin.strip()
     ]
 
