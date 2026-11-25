@@ -1,14 +1,14 @@
 from datetime import datetime, timezone
 from typing import Optional
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 class UserBase(BaseModel):
-    email: EmailStr
+    email: str = Field(..., min_length=3, max_length=255)
     full_name: str
     org_id: str
 
 class UserCreate(BaseModel):
-    email: EmailStr
+    email: str = Field(..., min_length=3, max_length=255)
     password: str = Field(..., min_length=4, max_length=128)
     full_name: str = Field(..., min_length=1, max_length=120)
     business_name: str = Field(..., min_length=1, max_length=150)
@@ -17,7 +17,7 @@ class UserCreate(BaseModel):
     industry: Optional[str] = "Retail & Consumer Goods"
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    email: str = Field(..., min_length=3, max_length=255)
     password: str
 
 class UserResponse(BaseModel):
