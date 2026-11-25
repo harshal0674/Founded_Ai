@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../api/client";
-import { DemoAccount } from "../types";
 
 interface LoginPageProps {
   navigate: (route: string) => void;
@@ -33,9 +32,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ navigate }) => {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Sign In Form State
-  const [signInEmail, setSignInEmail] = useState("gada@electronics.in");
-  const [signInPassword, setSignInPassword] = useState("password123");
+  // Sign In Form State (unfilled by default for clean customer login)
+  const [signInEmail, setSignInEmail] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
 
   // Register Form State
   const [regFullName, setRegFullName] = useState("");
@@ -44,52 +43,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ navigate }) => {
   const [regPassword, setRegPassword] = useState("");
   const [regCurrency, setRegCurrency] = useState("INR");
   const [regIndustry, setRegIndustry] = useState("Electronics & Gadgets");
-
-  // Pre-configured demo accounts
-  const [demoAccounts, setDemoAccounts] = useState<DemoAccount[]>([
-    {
-      name: "Gada Electronics",
-      email: "gada@electronics.in",
-      password: "password123",
-      owner: "Jethalal Gada",
-      industry: "Electronics & Gadgets",
-      currency: "INR (₹)",
-      description: "Pre-loaded with smartphones, Apple gear, and electronics velocity."
-    },
-    {
-      name: "Bharat Retail Corp",
-      email: "bharat@retail.in",
-      password: "password123",
-      owner: "Ramesh Kumar",
-      industry: "Supermarket & FMCG Goods",
-      currency: "INR (₹)",
-      description: "Pre-loaded with grains, teas, spices, and supermarket staples."
-    }
-  ]);
-
-  useEffect(() => {
-    api.getDemoAccounts()
-      .then((data) => {
-        if (data && data.length > 0) setDemoAccounts(data);
-      })
-      .catch(() => {});
-  }, []);
-
-  // If already authenticated and visits /login, show active account banner or redirect
-  const handleQuickLogin = async (acc: DemoAccount) => {
-    setError(null);
-    setLoading(true);
-    try {
-      await login(acc.email, acc.password);
-      setSuccessMsg(`Welcome back to ${acc.name}! Redirecting to workspace...`);
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 500);
-    } catch (err: any) {
-      setError(err.message || "Failed to log in with demo account");
-      setLoading(false);
-    }
-  };
 
   const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -289,12 +242,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ navigate }) => {
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-apple-text-secondary font-medium">Account Password</label>
-                  <span className="text-[10px] text-apple-text-tertiary font-mono">
-                    Default demo: password123
-                  </span>
-                </div>
+                <label className="block text-apple-text-secondary font-medium mb-1.5">
+                  Account Password
+                </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-apple-text-tertiary absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
@@ -446,56 +396,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ navigate }) => {
               </button>
             </form>
           )}
-
-          {/* Quick Demo Customer Switcher Section */}
-          <div className="mt-8 pt-6 border-t border-[#EFE7E4]">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-semibold text-apple-text uppercase tracking-wider font-mono">
-                ⚡ 1-Click Customer Test Switcher
-              </span>
-              <span className="text-[10px] text-[#B76E79] font-mono font-medium">
-                Try Different Customer Ledgers
-              </span>
-            </div>
-
-            <p className="text-[11px] text-apple-text-secondary mb-3">
-              Click either customer below to instantly log in and experience complete data isolation between customer stores:
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {demoAccounts.map((acc) => (
-                <button
-                  key={acc.email}
-                  type="button"
-                  onClick={() => handleQuickLogin(acc)}
-                  disabled={loading}
-                  className="p-3.5 rounded-2xl bg-[#FAF8F5] hover:bg-[#FDF5F6] border border-[#EFE7E4] hover:border-[#F6D9DE] text-left transition-all group flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-xs text-apple-text group-hover:text-[#B76E79] transition-colors">
-                        {acc.name}
-                      </span>
-                      <span className="text-[10px] font-mono text-apple-text-tertiary">
-                        {acc.currency}
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-apple-text-secondary block mt-0.5">
-                      Owner: {acc.owner}
-                    </span>
-                    <p className="text-[10px] text-apple-text-tertiary line-clamp-2 mt-1 leading-relaxed">
-                      {acc.description}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 flex items-center justify-between text-[10px] font-mono text-[#B76E79] font-medium pt-2 border-t border-[#EFE7E4]/60">
-                    <span>Login as {acc.name.split(" ")[0]}</span>
-                    <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </main>
 

@@ -96,7 +96,7 @@ export const SalesPage: React.FC = () => {
   const totalUnits = sales.reduce((acc, s) => acc + s.quantity, 0);
 
   return (
-    <div className="p-6 md:p-10 space-y-6 max-w-7xl mx-auto w-full">
+    <div className="p-4 sm:p-6 md:p-10 space-y-6 max-w-7xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#EFE7E4]">
         <div>
@@ -283,18 +283,23 @@ export const SalesPage: React.FC = () => {
         {/* Sales History Ledger */}
         <div className="lg:col-span-7 space-y-6">
           {/* Quick Metrics Cards */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="apple-card p-5 bg-white border border-[#EFE7E4]">
-              <span className="text-[11px] font-mono text-apple-text-secondary">Orders Dispatched</span>
-              <div className="font-bold text-2xl text-apple-text mt-1">{sales.length}</div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 bg-white border border-[#EFE7E4]">
+              <span className="text-[10px] sm:text-[11px] font-mono text-apple-text-secondary truncate block">Orders Dispatched</span>
+              <div className="font-bold text-base sm:text-xl lg:text-2xl text-apple-text mt-1 truncate">{sales.length}</div>
             </div>
-            <div className="apple-card p-5 bg-white border border-[#EFE7E4]">
-              <span className="text-[11px] font-mono text-apple-text-secondary">Units Sold</span>
-              <div className="font-bold text-2xl text-apple-text mt-1">{formatIndianNumber(totalUnits)}</div>
+            <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 bg-white border border-[#EFE7E4]">
+              <span className="text-[10px] sm:text-[11px] font-mono text-apple-text-secondary truncate block">Units Sold</span>
+              <div className="font-bold text-base sm:text-xl lg:text-2xl text-apple-text mt-1 truncate">{formatIndianNumber(totalUnits)}</div>
             </div>
-            <div className="apple-card p-5 bg-white border border-[#EFE7E4]">
-              <span className="text-[11px] font-mono text-apple-text-secondary">Gross Revenue</span>
-              <div className="font-bold text-2xl text-[#B76E79] mt-1 font-mono">{formatCurrency(totalRevenue)}</div>
+            <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 bg-white border border-[#EFE7E4]">
+              <span className="text-[10px] sm:text-[11px] font-mono text-apple-text-secondary truncate block">Gross Revenue</span>
+              <div
+                className="font-bold text-base sm:text-xl lg:text-2xl text-[#B76E79] mt-1 font-mono truncate"
+                title={formatCurrency(totalRevenue)}
+              >
+                {formatCurrency(totalRevenue)}
+              </div>
             </div>
           </div>
 

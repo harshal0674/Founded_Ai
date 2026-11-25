@@ -5,7 +5,7 @@ import { api } from "../api/client";
 interface OrganizationContextType {
   organization: OrganizationProfile;
   updateOrganization: (updates: Partial<OrganizationProfile>) => Promise<void>;
-  formatCurrency: (amount: number, showSymbol?: boolean) => string;
+  formatCurrency: (amount: number, showSymbol?: boolean, options?: { forceDecimals?: boolean }) => string;
   currencySymbol: string;
   clearCatalog: () => Promise<{ success: boolean; message: string }>;
   reloadDemoData: () => Promise<any>;
@@ -94,12 +94,13 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return res;
   };
 
-  const formatCurrency = (amount: number, showSymbol = true): string => {
+  const formatCurrency = (amount: number, showSymbol = true, options?: { forceDecimals?: boolean }): string => {
     const num = isNaN(amount) ? 0 : amount;
     const isINR = organization.currency === "INR";
     const locale = isINR ? "en-IN" : "en-US";
+    const hasDecimals = options?.forceDecimals || (num % 1 !== 0);
     const formatted = num.toLocaleString(locale, {
-      minimumFractionDigits: 2,
+      minimumFractionDigits: hasDecimals ? 2 : 0,
       maximumFractionDigits: 2,
     });
     const symbol = organization.currency_symbol || "₹";

@@ -55,7 +55,7 @@ export const RecommendationsPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto w-full">
+    <div className="p-4 sm:p-6 md:p-10 space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#EFE7E4]">
         <div>
@@ -99,49 +99,52 @@ export const RecommendationsPage: React.FC = () => {
 
       {/* Priority Summary Cards */}
       {data && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="apple-card p-5 border-apple-red/30 bg-white space-y-1">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 border-apple-red/30 bg-white space-y-1">
             <div className="flex items-center justify-between text-apple-red text-xs font-mono font-semibold">
-              <span>CRITICAL DEFICIT</span>
-              <ShieldAlert className="w-4 h-4" />
+              <span className="truncate">CRITICAL DEFICIT</span>
+              <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
             </div>
-            <div className="font-bold text-3xl text-apple-red mt-1">
+            <div className="font-bold text-base sm:text-xl lg:text-2xl xl:text-3xl text-apple-red mt-1 truncate">
               {data.critical_count}
             </div>
-            <p className="text-[11px] text-apple-text-secondary font-mono">Stockout or &lt; Lead Time</p>
+            <p className="text-[10px] sm:text-[11px] text-apple-text-secondary font-mono truncate">Stockout or &lt; Lead Time</p>
           </div>
 
-          <div className="apple-card p-5 border-apple-orange/30 bg-white space-y-1">
+          <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 border-apple-orange/30 bg-white space-y-1">
             <div className="flex items-center justify-between text-apple-orange text-xs font-mono font-semibold">
-              <span>REORDER TRIGGERED</span>
-              <AlertTriangle className="w-4 h-4" />
+              <span className="truncate">REORDER TRIGGERED</span>
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
             </div>
-            <div className="font-bold text-3xl text-apple-orange mt-1">
+            <div className="font-bold text-base sm:text-xl lg:text-2xl xl:text-3xl text-apple-orange mt-1 truncate">
               {data.high_count}
             </div>
-            <p className="text-[11px] text-apple-text-secondary font-mono">Stock &le; Reorder Point</p>
+            <p className="text-[10px] sm:text-[11px] text-apple-text-secondary font-mono truncate">Stock &le; Reorder Point</p>
           </div>
 
-          <div className="apple-card p-5 space-y-1 bg-white border border-[#EFE7E4]">
+          <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 space-y-1 bg-white border border-[#EFE7E4]">
             <div className="flex items-center justify-between text-apple-text-secondary text-xs font-mono">
-              <span>MONITOR CLOSELY</span>
-              <Clock className="w-4 h-4" />
+              <span className="truncate">MONITOR CLOSELY</span>
+              <Clock className="w-3.5 h-3.5 shrink-0" />
             </div>
-            <div className="font-bold text-3xl text-apple-text mt-1">
+            <div className="font-bold text-base sm:text-xl lg:text-2xl xl:text-3xl text-apple-text mt-1 truncate">
               {data.medium_count}
             </div>
-            <p className="text-[11px] text-apple-text-secondary font-mono">Within 35% of ROP</p>
+            <p className="text-[10px] sm:text-[11px] text-apple-text-secondary font-mono truncate">Within 35% of ROP</p>
           </div>
 
-          <div className="apple-card p-5 space-y-1 bg-white border border-[#EFE7E4]">
+          <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 space-y-1 bg-white border border-[#EFE7E4]">
             <div className="flex items-center justify-between text-apple-text-secondary text-xs font-mono">
-              <span>REQUIRED CAPITAL</span>
-              <span className="font-bold text-[#B76E79] font-mono">{currencySymbol}</span>
+              <span className="truncate">REQUIRED CAPITAL</span>
+              <span className="font-bold text-[#B76E79] font-mono shrink-0">{currencySymbol}</span>
             </div>
-            <div className="font-bold text-2xl text-[#B76E79] mt-1 font-mono">
+            <div
+              className="font-bold text-base sm:text-xl lg:text-2xl xl:text-3xl text-[#B76E79] mt-1 font-mono truncate"
+              title={formatCurrency(data.total_capital_required)}
+            >
               {formatCurrency(data.total_capital_required)}
             </div>
-            <p className="text-[11px] text-apple-text-secondary font-mono">To satisfy reorder triggers</p>
+            <p className="text-[10px] sm:text-[11px] text-apple-text-secondary font-mono truncate">To satisfy reorder triggers</p>
           </div>
         </div>
       )}

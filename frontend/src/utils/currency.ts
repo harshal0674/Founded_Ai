@@ -55,10 +55,11 @@ export function parseIndianNumber(value: string | number | undefined | null): nu
 /**
  * Full currency presentation with symbol and 2 decimal places (or integer for whole numbers)
  */
-export function formatIndianCurrency(amount: number, symbol = "₹"): string {
+export function formatIndianCurrency(amount: number, symbol = "₹", forceDecimals = false): string {
   const num = isNaN(amount) ? 0 : amount;
+  const hasDecimals = forceDecimals || (num % 1 !== 0);
   return `${symbol}${num.toLocaleString("en-IN", {
-    minimumFractionDigits: 2,
+    minimumFractionDigits: hasDecimals ? 2 : 0,
     maximumFractionDigits: 2,
   })}`;
 }

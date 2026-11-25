@@ -61,7 +61,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
   }, []);
 
   return (
-    <div className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto w-full">
+    <div className="p-4 sm:p-6 md:p-10 space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#EFE7E4]">
         <div>
@@ -114,31 +114,37 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
       )}
 
       {/* Primary KPI Grid (Minimalist Crisp White Cards with Rose Gold accents) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
         {/* Total Stock Value */}
-        <div className="apple-card p-5 md:p-6 space-y-2">
-          <div className="flex items-center justify-between text-xs text-apple-text-secondary font-medium">
-            <span>Total Stock Value</span>
-            <span className="font-mono text-[#B76E79] font-bold">{currencySymbol}</span>
+        <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 md:p-6 space-y-1.5 sm:space-y-2">
+          <div className="flex items-center justify-between text-[11px] sm:text-xs text-apple-text-secondary font-medium">
+            <span className="truncate">Total Stock Value</span>
+            <span className="font-mono text-[#B76E79] font-bold shrink-0">{currencySymbol}</span>
           </div>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-text font-mono">
+          <div
+            className="text-base sm:text-xl lg:text-2xl xl:text-3xl font-bold tracking-tight text-apple-text font-mono truncate"
+            title={stats ? formatCurrency(stats.total_stock_value) : formatCurrency(0)}
+          >
             {stats ? formatCurrency(stats.total_stock_value) : formatCurrency(0)}
           </div>
-          <div className="text-xs text-apple-text-secondary font-mono">
+          <div className="text-[11px] sm:text-xs text-apple-text-secondary font-mono truncate">
             {stats?.total_products || 0} active catalog SKUs
           </div>
         </div>
 
         {/* 30-Day Gross Revenue */}
-        <div className="apple-card p-5 md:p-6 space-y-2">
-          <div className="flex items-center justify-between text-xs text-apple-text-secondary font-medium">
-            <span>30-Day Revenue</span>
-            <TrendingUp className="w-4 h-4 text-apple-green" />
+        <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 md:p-6 space-y-1.5 sm:space-y-2">
+          <div className="flex items-center justify-between text-[11px] sm:text-xs text-apple-text-secondary font-medium">
+            <span className="truncate">30-Day Revenue</span>
+            <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-apple-green shrink-0" />
           </div>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-text font-mono">
+          <div
+            className="text-base sm:text-xl lg:text-2xl xl:text-3xl font-bold tracking-tight text-apple-text font-mono truncate"
+            title={stats ? formatCurrency(stats.total_revenue_30d) : formatCurrency(0)}
+          >
             {stats ? formatCurrency(stats.total_revenue_30d) : formatCurrency(0)}
           </div>
-          <div className="text-xs text-apple-text-secondary font-mono">
+          <div className="text-[11px] sm:text-xs text-apple-text-secondary font-mono truncate">
             {stats?.total_units_sold_30d || 0} units dispatched
           </div>
         </div>
@@ -146,35 +152,35 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
         {/* Stockout Risk Count */}
         <div
           onClick={() => navigate("/recommendations")}
-          className="apple-card p-5 md:p-6 space-y-2 cursor-pointer hover:border-apple-red/50 transition-colors"
+          className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 md:p-6 space-y-1.5 sm:space-y-2 cursor-pointer hover:border-apple-red/50 transition-colors"
         >
-          <div className="flex items-center justify-between text-xs text-apple-text-secondary font-medium">
-            <span>Stockout Risks</span>
-            <AlertTriangle className="w-4 h-4 text-apple-red" />
+          <div className="flex items-center justify-between text-[11px] sm:text-xs text-apple-text-secondary font-medium">
+            <span className="truncate">Stockout Risks</span>
+            <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-apple-red shrink-0" />
           </div>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-red font-mono">
+          <div className="text-base sm:text-xl lg:text-2xl xl:text-3xl font-bold tracking-tight text-apple-red font-mono truncate">
             {stats?.stockout_risk_count ?? 0}
           </div>
-          <div className="text-xs text-apple-red flex items-center space-x-1 font-medium">
-            <span>Days to stockout &lt; Lead Time</span>
-            <ArrowUpRight className="w-3 h-3" />
+          <div className="text-[11px] sm:text-xs text-apple-red flex items-center space-x-1 font-medium truncate">
+            <span className="truncate">Days &lt; Lead Time</span>
+            <ArrowUpRight className="w-3 h-3 shrink-0" />
           </div>
         </div>
 
         {/* Reorders Pending */}
         <div
           onClick={() => navigate("/recommendations")}
-          className="apple-card p-5 md:p-6 space-y-2 cursor-pointer hover:border-[#DE9FAD] transition-colors"
+          className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 md:p-6 space-y-1.5 sm:space-y-2 cursor-pointer hover:border-[#DE9FAD] transition-colors"
         >
-          <div className="flex items-center justify-between text-xs text-apple-text-secondary font-medium">
-            <span>Reorders Triggered</span>
-            <ShieldAlert className="w-4 h-4 text-[#B76E79]" />
+          <div className="flex items-center justify-between text-[11px] sm:text-xs text-apple-text-secondary font-medium">
+            <span className="truncate">Reorders Triggered</span>
+            <ShieldAlert className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#B76E79] shrink-0" />
           </div>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-[#B76E79] font-mono">
+          <div className="text-base sm:text-xl lg:text-2xl xl:text-3xl font-bold tracking-tight text-[#B76E79] font-mono truncate">
             {stats?.reorder_pending_count ?? 0}
           </div>
-          <div className="text-xs text-apple-text-secondary font-mono">
-            Inventory &le; Reorder Point (ROP)
+          <div className="text-[11px] sm:text-xs text-apple-text-secondary font-mono truncate">
+            Inventory &le; ROP
           </div>
         </div>
       </div>

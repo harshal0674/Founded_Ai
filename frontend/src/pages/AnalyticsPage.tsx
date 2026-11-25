@@ -59,7 +59,7 @@ export const AnalyticsPage: React.FC = () => {
   const COLORS = ["#B76E79", "#D4A373", "#8FA287", "#C5808B"];
 
   return (
-    <div className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto w-full">
+    <div className="p-4 sm:p-6 md:p-10 space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#EFE7E4]">
         <div>
@@ -87,39 +87,45 @@ export const AnalyticsPage: React.FC = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="apple-card p-5 space-y-1 bg-white border border-[#EFE7E4]">
-          <span className="text-[11px] font-mono text-apple-text-secondary">Balance Sheet Valuation</span>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-text font-mono">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 space-y-1 bg-white border border-[#EFE7E4]">
+          <span className="text-[10px] sm:text-[11px] font-mono text-apple-text-secondary truncate block">Balance Sheet Valuation</span>
+          <div
+            className="text-base sm:text-xl lg:text-2xl xl:text-3xl font-bold tracking-tight text-apple-text font-mono truncate"
+            title={stats ? formatCurrency(stats.total_stock_value) : formatCurrency(0)}
+          >
             {stats ? formatCurrency(stats.total_stock_value) : formatCurrency(0)}
           </div>
-          <p className="text-[10px] text-apple-text-secondary font-mono">Current capital tied in inventory</p>
+          <p className="text-[10px] text-apple-text-secondary font-mono truncate">Current capital in inventory</p>
         </div>
 
-        <div className="apple-card p-5 space-y-1 bg-white border border-[#EFE7E4]">
-          <span className="text-[11px] font-mono text-apple-text-secondary">30-Day Revenue</span>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-[#B76E79] font-mono">
+        <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 space-y-1 bg-white border border-[#EFE7E4]">
+          <span className="text-[10px] sm:text-[11px] font-mono text-apple-text-secondary truncate block">30-Day Revenue</span>
+          <div
+            className="text-base sm:text-xl lg:text-2xl xl:text-3xl font-bold tracking-tight text-[#B76E79] font-mono truncate"
+            title={stats ? formatCurrency(stats.total_revenue_30d) : formatCurrency(0)}
+          >
             {stats ? formatCurrency(stats.total_revenue_30d) : formatCurrency(0)}
           </div>
-          <p className="text-[10px] text-apple-text-secondary font-mono">Gross channel throughput</p>
+          <p className="text-[10px] text-apple-text-secondary font-mono truncate">Gross channel throughput</p>
         </div>
 
-        <div className="apple-card p-5 space-y-1 bg-white border border-[#EFE7E4]">
-          <span className="text-[11px] font-mono text-apple-text-secondary">Active SKUs</span>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-apple-text">
+        <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 space-y-1 bg-white border border-[#EFE7E4]">
+          <span className="text-[10px] sm:text-[11px] font-mono text-apple-text-secondary truncate block">Active SKUs</span>
+          <div className="text-base sm:text-xl lg:text-2xl xl:text-3xl font-bold tracking-tight text-apple-text truncate">
             {stats?.total_products || 0}
           </div>
-          <p className="text-[10px] text-apple-text-secondary font-mono">Tracked product lines</p>
+          <p className="text-[10px] text-apple-text-secondary font-mono truncate">Tracked product lines</p>
         </div>
 
-        <div className="apple-card p-5 space-y-1 bg-white border border-[#EFE7E4]">
-          <span className="text-[11px] font-mono text-apple-text-secondary">Annualized Turnover</span>
-          <div className="text-2xl md:text-3xl font-bold tracking-tight text-[#B76E79]">
+        <div className="apple-card min-w-0 overflow-hidden p-3.5 sm:p-5 space-y-1 bg-white border border-[#EFE7E4]">
+          <span className="text-[10px] sm:text-[11px] font-mono text-apple-text-secondary truncate block">Annualized Turnover</span>
+          <div className="text-base sm:text-xl lg:text-2xl xl:text-3xl font-bold tracking-tight text-[#B76E79] truncate">
             {stats && stats.total_stock_value > 0
               ? (stats.total_revenue_30d / stats.total_stock_value * 12).toFixed(1)
               : "0.0"}x
           </div>
-          <p className="text-[10px] text-apple-text-secondary font-mono">Turn velocity benchmark</p>
+          <p className="text-[10px] text-apple-text-secondary font-mono truncate">Turn velocity benchmark</p>
         </div>
       </div>
 

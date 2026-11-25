@@ -89,7 +89,7 @@ export const ForecastingPage: React.FC = () => {
     : 0;
 
   return (
-    <div className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto w-full">
+    <div className="p-4 sm:p-6 md:p-10 space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#EFE7E4]">
         <div>
@@ -168,47 +168,47 @@ export const ForecastingPage: React.FC = () => {
 
       {/* Evaluated Model Performance Cards */}
       {forecastData && (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="apple-card p-4 space-y-1 bg-white border border-[#EFE7E4]">
-            <span className="text-[10px] font-mono text-apple-text-secondary uppercase">Model Architecture</span>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+          <div className="apple-card min-w-0 overflow-hidden p-3 sm:p-4 space-y-1 bg-white border border-[#EFE7E4]">
+            <span className="text-[10px] font-mono text-apple-text-secondary uppercase truncate block">Model Architecture</span>
             <div className="font-semibold text-xs text-apple-text truncate" title={forecastData.model_used}>
               {forecastData.metrics.is_fallback ? "Moving Average Fallback" : "Ridge Regression"}
             </div>
-            <div className="text-[10px] text-apple-text-secondary font-mono">
+            <div className="text-[10px] text-apple-text-secondary font-mono truncate">
               {forecastData.metrics.data_points} training points
             </div>
           </div>
 
-          <div className="apple-card p-4 space-y-1 bg-white border border-[#EFE7E4]">
-            <span className="text-[10px] font-mono text-apple-text-secondary uppercase">Mean Abs Error (MAE)</span>
-            <div className="font-bold text-2xl text-apple-text">
+          <div className="apple-card min-w-0 overflow-hidden p-3 sm:p-4 space-y-1 bg-white border border-[#EFE7E4]">
+            <span className="text-[10px] font-mono text-apple-text-secondary uppercase truncate block">Mean Abs Error (MAE)</span>
+            <div className="font-bold text-base sm:text-xl md:text-2xl text-apple-text truncate">
               {forecastData.metrics.mae} <span className="text-xs font-normal text-apple-text-secondary">units</span>
             </div>
-            <div className="text-[10px] text-apple-text-secondary font-mono">Holdout error</div>
+            <div className="text-[10px] text-apple-text-secondary font-mono truncate">Holdout error</div>
           </div>
 
-          <div className="apple-card p-4 space-y-1 bg-white border border-[#EFE7E4]">
-            <span className="text-[10px] font-mono text-apple-text-secondary uppercase">Root Mean Sq (RMSE)</span>
-            <div className="font-bold text-2xl text-apple-text">
+          <div className="apple-card min-w-0 overflow-hidden p-3 sm:p-4 space-y-1 bg-white border border-[#EFE7E4]">
+            <span className="text-[10px] font-mono text-apple-text-secondary uppercase truncate block">Root Mean Sq (RMSE)</span>
+            <div className="font-bold text-base sm:text-xl md:text-2xl text-apple-text truncate">
               {forecastData.metrics.rmse} <span className="text-xs font-normal text-apple-text-secondary">units</span>
             </div>
-            <div className="text-[10px] text-apple-text-secondary font-mono">Penalizes large errors</div>
+            <div className="text-[10px] text-apple-text-secondary font-mono truncate">Penalizes large errors</div>
           </div>
 
-          <div className="apple-card p-4 space-y-1 bg-white border border-[#EFE7E4]">
-            <span className="text-[10px] font-mono text-apple-text-secondary uppercase">MAPE Accuracy</span>
-            <div className="font-bold text-2xl text-apple-green">
+          <div className="apple-card min-w-0 overflow-hidden p-3 sm:p-4 space-y-1 bg-white border border-[#EFE7E4]">
+            <span className="text-[10px] font-mono text-apple-text-secondary uppercase truncate block">MAPE Accuracy</span>
+            <div className="font-bold text-base sm:text-xl md:text-2xl text-apple-green truncate">
               {forecastData.metrics.mape}%
             </div>
-            <div className="text-[10px] text-apple-text-secondary font-mono">Relative error</div>
+            <div className="text-[10px] text-apple-text-secondary font-mono truncate">Relative error</div>
           </div>
 
-          <div className="apple-card p-4 space-y-1 col-span-2 md:col-span-1 bg-white border border-[#EFE7E4]">
-            <span className="text-[10px] font-mono text-apple-text-secondary uppercase">Expected Horizon Demand</span>
-            <div className="font-bold text-2xl text-[#B76E79]">
+          <div className="apple-card min-w-0 overflow-hidden p-3 sm:p-4 space-y-1 col-span-2 md:col-span-1 bg-white border border-[#EFE7E4]">
+            <span className="text-[10px] font-mono text-apple-text-secondary uppercase truncate block">Expected Demand</span>
+            <div className="font-bold text-base sm:text-xl md:text-2xl text-[#B76E79] truncate">
               {Math.round(totalForecastUnits).toLocaleString("en-IN")} <span className="text-xs font-normal text-apple-text-secondary">units</span>
             </div>
-            <div className="text-[10px] text-apple-text-secondary font-mono">Next {horizonDays} days</div>
+            <div className="text-[10px] text-apple-text-secondary font-mono truncate">Next {horizonDays} days</div>
           </div>
         </div>
       )}

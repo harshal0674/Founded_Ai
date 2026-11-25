@@ -250,7 +250,7 @@ export const InventoryPage: React.FC = () => {
   ]));
 
   return (
-    <div className="p-6 md:p-10 space-y-6 max-w-7xl mx-auto w-full">
+    <div className="p-4 sm:p-6 md:p-10 space-y-6 max-w-7xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#EFE7E4]">
         <div>
