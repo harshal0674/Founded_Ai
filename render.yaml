@@ -1,13 +1,15 @@
 services:
   - type: web
-    name: stockmind-ai-backend
+    name: founded-ai-backend
     env: python
     region: oregon
     plan: free
-    buildCommand: "pip install -r backend/requirements.txt"
-    startCommand: "python backend/run.py"
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python main.py"
     healthCheckPath: /health
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
       - key: PORT
         value: 8000
       - key: HOST
@@ -19,4 +21,4 @@ services:
       - key: MONGODB_DB_NAME
         value: stockmind_db
       - key: CORS_ORIGINS
-        value: "https://stockmind-ai.vercel.app,http://localhost:5173,http://localhost:3000"
+        value: "*"
