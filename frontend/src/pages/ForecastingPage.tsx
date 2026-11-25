@@ -206,7 +206,7 @@ export const ForecastingPage: React.FC = () => {
           <div className="apple-card p-4 space-y-1 col-span-2 md:col-span-1 bg-white border border-[#EFE7E4]">
             <span className="text-[10px] font-mono text-apple-text-secondary uppercase">Expected Horizon Demand</span>
             <div className="font-bold text-2xl text-[#B76E79]">
-              {Math.round(totalForecastUnits).toLocaleString()} <span className="text-xs font-normal text-apple-text-secondary">units</span>
+              {Math.round(totalForecastUnits).toLocaleString("en-IN")} <span className="text-xs font-normal text-apple-text-secondary">units</span>
             </div>
             <div className="text-[10px] text-apple-text-secondary font-mono">Next {horizonDays} days</div>
           </div>

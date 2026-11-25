@@ -14,6 +14,7 @@ import {
 import { api } from "../api/client";
 import { useOrganization } from "../context/OrganizationContext";
 import { Product, ProductCreate } from "../types";
+import { formatIndianNumber, parseIndianNumber } from "../utils/currency";
 
 export const InventoryPage: React.FC = () => {
   const { organization, formatCurrency, currencySymbol, clearCatalog, reloadDemoData } = useOrganization();
@@ -35,16 +36,16 @@ export const InventoryPage: React.FC = () => {
   // Form states
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [restockQty, setRestockQty] = useState<number | string>(25);
+  const [restockQty, setRestockQty] = useState<string>("25");
 
   const [formData, setFormData] = useState<any>({
     name: "",
     sku: "",
     category: "Retail & FMCG",
-    current_stock: 50,
-    min_stock_level: 15,
-    unit_cost: 250.0,
-    selling_price: 499.0,
+    current_stock: formatIndianNumber(50),
+    min_stock_level: formatIndianNumber(15),
+    unit_cost: formatIndianNumber(250),
+    selling_price: formatIndianNumber(499),
     lead_time_days: 5,
     supplier_name: "Direct Wholesale Supply",
     supplier_email: "orders@wholesalepartner.example"
@@ -87,10 +88,10 @@ export const InventoryPage: React.FC = () => {
     try {
       const payload: ProductCreate = {
         ...formData,
-        current_stock: Number(formData.current_stock) || 0,
-        min_stock_level: Number(formData.min_stock_level) || 0,
-        unit_cost: Number(formData.unit_cost) || 0,
-        selling_price: Number(formData.selling_price) || 0,
+        current_stock: parseIndianNumber(formData.current_stock),
+        min_stock_level: parseIndianNumber(formData.min_stock_level),
+        unit_cost: parseIndianNumber(formData.unit_cost),
+        selling_price: parseIndianNumber(formData.selling_price),
         lead_time_days: Number(formData.lead_time_days) || 1,
       };
       await api.createProduct(payload);
@@ -112,10 +113,10 @@ export const InventoryPage: React.FC = () => {
     try {
       const payload = {
         ...formData,
-        current_stock: Number(formData.current_stock) || 0,
-        min_stock_level: Number(formData.min_stock_level) || 0,
-        unit_cost: Number(formData.unit_cost) || 0,
-        selling_price: Number(formData.selling_price) || 0,
+        current_stock: parseIndianNumber(formData.current_stock),
+        min_stock_level: parseIndianNumber(formData.min_stock_level),
+        unit_cost: parseIndianNumber(formData.unit_cost),
+        selling_price: parseIndianNumber(formData.selling_price),
         lead_time_days: Number(formData.lead_time_days) || 1,
       };
       await api.updateProduct(activeProduct.id, payload);
@@ -144,9 +145,14 @@ export const InventoryPage: React.FC = () => {
   const handleRestockSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeProduct) return;
+    const finalQty = parseIndianNumber(restockQty);
+    if (!finalQty || finalQty <= 0) {
+      alert("Please enter a valid replenishment quantity.");
+      return;
+    }
     setFormLoading(true);
     try {
-      await api.restockProduct(activeProduct.id, Number(restockQty));
+      await api.restockProduct(activeProduct.id, finalQty);
       setIsRestockModalOpen(false);
       setActiveProduct(null);
       loadProducts();
@@ -191,10 +197,10 @@ export const InventoryPage: React.FC = () => {
       name: p.name,
       sku: p.sku,
       category: p.category,
-      current_stock: p.current_stock,
-      min_stock_level: p.min_stock_level,
-      unit_cost: p.unit_cost,
-      selling_price: p.selling_price,
+      current_stock: formatIndianNumber(p.current_stock),
+      min_stock_level: formatIndianNumber(p.min_stock_level),
+      unit_cost: formatIndianNumber(p.unit_cost),
+      selling_price: formatIndianNumber(p.selling_price),
       lead_time_days: p.lead_time_days,
       supplier_name: p.supplier_name,
       supplier_email: p.supplier_email
@@ -205,7 +211,7 @@ export const InventoryPage: React.FC = () => {
 
   const openRestockModal = (p: Product) => {
     setActiveProduct(p);
-    setRestockQty(25);
+    setRestockQty(formatIndianNumber(25));
     setIsRestockModalOpen(true);
   };
 
@@ -214,10 +220,10 @@ export const InventoryPage: React.FC = () => {
       name: "",
       sku: `SKU-IN-${Math.floor(1000 + Math.random() * 9000)}`,
       category: "Retail & FMCG",
-      current_stock: 50,
-      min_stock_level: 15,
-      unit_cost: 250.0,
-      selling_price: 499.0,
+      current_stock: formatIndianNumber(50),
+      min_stock_level: formatIndianNumber(15),
+      unit_cost: formatIndianNumber(250),
+      selling_price: formatIndianNumber(499),
       lead_time_days: 5,
       supplier_name: "Direct Wholesale Supply",
       supplier_email: "orders@wholesalepartner.example"
@@ -421,10 +427,10 @@ export const InventoryPage: React.FC = () => {
                         </td>
                         <td className="py-4 px-5 text-apple-text-secondary">{p.category}</td>
                         <td className="py-4 px-5 text-right font-mono font-medium text-apple-text">
-                          {p.current_stock.toLocaleString()}
+                          {p.current_stock.toLocaleString("en-IN")}
                         </td>
                         <td className="py-4 px-5 text-right font-mono text-apple-text-secondary">
-                          {p.min_stock_level}
+                          {p.min_stock_level.toLocaleString("en-IN")}
                         </td>
                         <td className="py-4 px-5 text-right font-mono text-apple-text-secondary">
                           {formatCurrency(p.unit_cost)}
@@ -479,7 +485,7 @@ export const InventoryPage: React.FC = () => {
                   {isAddModalOpen ? "Add New Product SKU" : `Edit SKU: ${activeProduct?.sku}`}
                 </h3>
                 <p className="text-[11px] text-apple-text-secondary">
-                  Organization: <strong className="text-apple-text">{organization.name}</strong> · All prices in {currencySymbol} {organization.currency}
+                  Organization: <strong className="text-apple-text">{organization.name}</strong> · All amounts formatted in {currencySymbol} INR (Indian Comma Rules)
                 </p>
               </div>
               <button
@@ -553,65 +559,71 @@ export const InventoryPage: React.FC = () => {
                 <div>
                   <label className="block text-apple-text-secondary font-medium mb-1">Current Stock Level *</label>
                   <input
-                    type="number"
-                    min="0"
+                    type="text"
+                    inputMode="numeric"
                     required
                     value={formData.current_stock}
-                    onChange={(e) => setFormData({ ...formData, current_stock: e.target.value === "" ? "" : Number(e.target.value) })}
-                    onBlur={() => {
-                      if (formData.current_stock === "") setFormData((prev: any) => ({ ...prev, current_stock: 0 }));
-                    }}
+                    onChange={(e) => setFormData({ ...formData, current_stock: formatIndianNumber(e.target.value) })}
                     className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
+                    placeholder="e.g. 50"
                   />
                 </div>
 
                 <div>
                   <label className="block text-apple-text-secondary font-medium mb-1">Min Alert Threshold *</label>
                   <input
-                    type="number"
-                    min="0"
+                    type="text"
+                    inputMode="numeric"
                     required
                     value={formData.min_stock_level}
-                    onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value === "" ? "" : Number(e.target.value) })}
-                    onBlur={() => {
-                      if (formData.min_stock_level === "") setFormData((prev: any) => ({ ...prev, min_stock_level: 0 }));
-                    }}
+                    onChange={(e) => setFormData({ ...formData, min_stock_level: formatIndianNumber(e.target.value) })}
                     className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
+                    placeholder="e.g. 15"
                   />
                 </div>
 
+                {/* Unit Cost with Indian Comma formatting */}
                 <div>
-                  <label className="block text-apple-text-secondary font-medium mb-1">Unit Cost ({currencySymbol}) *</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    required
-                    value={formData.unit_cost}
-                    onChange={(e) => setFormData({ ...formData, unit_cost: e.target.value === "" ? "" : e.target.value })}
-                    onBlur={() => {
-                      if (formData.unit_cost === "") setFormData((prev: any) => ({ ...prev, unit_cost: 0 }));
-                    }}
-                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
-                    placeholder="e.g. 250.00"
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-apple-text-secondary font-medium">Unit Cost ({currencySymbol}) *</label>
+                    <span className="text-[10px] text-apple-text-tertiary font-mono">Indian Comma Rule</span>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-apple-text-secondary font-mono text-xs select-none font-semibold">
+                      {currencySymbol}
+                    </span>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      required
+                      value={formData.unit_cost}
+                      onChange={(e) => setFormData({ ...formData, unit_cost: formatIndianNumber(e.target.value) })}
+                      className="w-full pl-7 pr-3 py-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
+                      placeholder="e.g. 1,50,000"
+                    />
+                  </div>
                 </div>
 
+                {/* Selling Price with Indian Comma formatting */}
                 <div>
-                  <label className="block text-apple-text-secondary font-medium mb-1">Selling Price ({currencySymbol}) *</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    required
-                    value={formData.selling_price}
-                    onChange={(e) => setFormData({ ...formData, selling_price: e.target.value === "" ? "" : e.target.value })}
-                    onBlur={() => {
-                      if (formData.selling_price === "") setFormData((prev: any) => ({ ...prev, selling_price: 0 }));
-                    }}
-                    className="w-full p-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
-                    placeholder="e.g. 499.00"
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-apple-text-secondary font-medium">Selling Price ({currencySymbol}) *</label>
+                    <span className="text-[10px] text-apple-text-tertiary font-mono">Indian Comma Rule</span>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-apple-text-secondary font-mono text-xs select-none font-semibold">
+                      {currencySymbol}
+                    </span>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      required
+                      value={formData.selling_price}
+                      onChange={(e) => setFormData({ ...formData, selling_price: formatIndianNumber(e.target.value) })}
+                      className="w-full pl-7 pr-3 py-2.5 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15 font-semibold"
+                      placeholder="e.g. 1,89,900"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -687,7 +699,7 @@ export const InventoryPage: React.FC = () => {
               <div className="p-3.5 bg-[#FAF8F5] rounded-xl border border-[#EFE7E4] space-y-1.5 font-mono">
                 <div className="flex justify-between">
                   <span className="text-apple-text-secondary">Current On-Hand:</span>
-                  <span className="text-apple-text font-semibold">{activeProduct.current_stock} units</span>
+                  <span className="text-apple-text font-semibold">{activeProduct.current_stock.toLocaleString("en-IN")} units</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-apple-text-secondary">Unit Cost:</span>
@@ -700,22 +712,18 @@ export const InventoryPage: React.FC = () => {
                   Replenishment Quantity (Units) *
                 </label>
                 <input
-                  type="number"
-                  min="1"
+                  type="text"
+                  inputMode="numeric"
                   required
                   value={restockQty}
-                  onChange={(e) => setRestockQty(e.target.value)}
-                  onBlur={() => {
-                    if (restockQty === "" || Number(restockQty) <= 0) {
-                      setRestockQty(25);
-                    }
-                  }}
+                  onChange={(e) => setRestockQty(formatIndianNumber(e.target.value))}
                   className="w-full p-3 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono text-sm focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
+                  placeholder="e.g. 500"
                 />
               </div>
 
               <div className="text-[11px] font-mono text-apple-text-secondary">
-                Estimated Capital Outlay: <strong className="text-apple-text">{formatCurrency((Number(restockQty) || 0) * activeProduct.unit_cost)}</strong>
+                Estimated Capital Outlay: <strong className="text-[#B76E79]">{formatCurrency(parseIndianNumber(restockQty) * activeProduct.unit_cost)}</strong>
               </div>
 
               <div className="pt-3 border-t border-[#EFE7E4] flex items-center justify-end space-x-3">

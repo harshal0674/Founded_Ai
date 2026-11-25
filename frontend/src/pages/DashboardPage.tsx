@@ -413,7 +413,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
                         {p.name}
                       </td>
                       <td className="py-3 px-3 text-right font-mono text-apple-text-secondary">
-                        {p.quantity.toLocaleString()}
+                        {p.quantity.toLocaleString("en-IN")}
                       </td>
                       <td className="py-3 px-3 text-right font-mono font-medium text-[#B76E79]">
                         {formatCurrency(p.revenue)}

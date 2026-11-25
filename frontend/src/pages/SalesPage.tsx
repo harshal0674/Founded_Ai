@@ -3,6 +3,7 @@ import { ShoppingCart, RefreshCw, AlertTriangle, CheckCircle2, User, Globe, Stor
 import { api } from "../api/client";
 import { useOrganization } from "../context/OrganizationContext";
 import { Product, Sale, SaleCreate } from "../types";
+import { formatIndianNumber, parseIndianNumber } from "../utils/currency";
 
 export const SalesPage: React.FC = () => {
   const { organization, formatCurrency, currencySymbol } = useOrganization();
@@ -12,7 +13,7 @@ export const SalesPage: React.FC = () => {
 
   // New Sale Form
   const [selectedProductId, setSelectedProductId] = useState<string>("");
-  const [quantity, setQuantity] = useState<number | string>(1);
+  const [quantity, setQuantity] = useState<string>("1");
   const [customerType, setCustomerType] = useState<string>("retail");
   const [customPrice, setCustomPrice] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
@@ -44,8 +45,8 @@ export const SalesPage: React.FC = () => {
   }, []);
 
   const selectedProduct = products.find((p) => p.id === selectedProductId);
-  const unitPrice = customPrice !== "" ? Number(customPrice) : selectedProduct?.selling_price || 0;
-  const numQty = quantity === "" ? 0 : Number(quantity);
+  const unitPrice = customPrice !== "" ? parseIndianNumber(customPrice) : selectedProduct?.selling_price || 0;
+  const numQty = quantity === "" ? 0 : parseIndianNumber(quantity);
   const totalPrice = (unitPrice * numQty).toFixed(2);
   const isStockInsufficient = selectedProduct ? numQty > selectedProduct.current_stock : false;
 
@@ -53,14 +54,14 @@ export const SalesPage: React.FC = () => {
     e.preventDefault();
     if (!selectedProductId) return;
     
-    const finalQty = Number(quantity);
+    const finalQty = parseIndianNumber(quantity);
     if (!finalQty || finalQty <= 0) {
       setFormError("Please enter a valid quantity of at least 1 unit.");
       return;
     }
 
     if (selectedProduct && finalQty > selectedProduct.current_stock) {
-      setFormError(`Cannot place order: requested ${finalQty} units, but only ${selectedProduct.current_stock} available.`);
+      setFormError(`Cannot place order: requested ${formatIndianNumber(finalQty)} units, but only ${formatIndianNumber(selectedProduct.current_stock)} available.`);
       return;
     }
 
@@ -73,13 +74,14 @@ export const SalesPage: React.FC = () => {
         product_id: selectedProductId,
         quantity: finalQty,
         customer_type: customerType,
-        custom_price: customPrice !== "" ? Number(customPrice) : undefined,
+        custom_price: customPrice !== "" ? parseIndianNumber(customPrice) : undefined,
         notes: notes || undefined,
       };
 
       await api.recordSale(payload);
-      setFormSuccess(`Order recorded! Atomically deducted ${finalQty} units from active inventory.`);
-      setQuantity(1);
+      setFormSuccess(`Order recorded! Atomically deducted ${formatIndianNumber(finalQty)} units from active inventory.`);
+      setQuantity("1");
+      setCustomPrice("");
       setNotes("");
       loadData();
       window.dispatchEvent(new CustomEvent("stockmind:refresh"));
@@ -160,7 +162,7 @@ export const SalesPage: React.FC = () => {
               >
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.name} ({p.sku}) — Available: {p.current_stock}
+                    {p.name} ({p.sku}) — Available: {formatIndianNumber(p.current_stock)}
                   </option>
                 ))}
               </select>
@@ -171,7 +173,7 @@ export const SalesPage: React.FC = () => {
               <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#EFE7E4] flex items-center justify-between font-mono text-[11px]">
                 <span className="text-apple-text-secondary">On-Hand Stock:</span>
                 <span className={`font-semibold ${selectedProduct.current_stock === 0 ? "text-apple-red" : selectedProduct.current_stock <= selectedProduct.min_stock_level ? "text-apple-orange" : "text-apple-green"}`}>
-                  {selectedProduct.current_stock} units
+                  {formatIndianNumber(selectedProduct.current_stock)} units
                 </span>
               </div>
             )}
@@ -185,18 +187,18 @@ export const SalesPage: React.FC = () => {
                 )}
               </div>
               <input
-                type="number"
-                min="1"
+                type="text"
+                inputMode="numeric"
                 required
                 value={quantity}
                 onChange={(e) => {
-                  const val = e.target.value;
+                  const val = formatIndianNumber(e.target.value);
                   setQuantity(val);
                   setFormError(null);
                 }}
                 onBlur={() => {
-                  if (quantity === "" || Number(quantity) <= 0) {
-                    setQuantity(1);
+                  if (quantity === "" || parseIndianNumber(quantity) <= 0) {
+                    setQuantity("1");
                   }
                 }}
                 placeholder="Enter units (e.g. 5)"
@@ -204,6 +206,27 @@ export const SalesPage: React.FC = () => {
                   isStockInsufficient ? "border-apple-red bg-apple-red/5" : "border-[#EFE7E4] focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
                 }`}
               />
+            </div>
+
+            {/* Custom Unit Price (Optional override) */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-apple-text-secondary font-medium">Custom Unit Price (Optional)</label>
+                <span className="text-apple-text-tertiary text-[11px] font-mono">Default: {formatCurrency(selectedProduct?.selling_price || 0)}</span>
+              </div>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-apple-text-tertiary font-mono text-xs">
+                  {currencySymbol}
+                </span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={customPrice}
+                  onChange={(e) => setCustomPrice(formatIndianNumber(e.target.value))}
+                  placeholder={`Leave blank to use ${formatCurrency(selectedProduct?.selling_price || 0)}`}
+                  className="w-full pl-7 pr-3 py-2 bg-[#FAF8F5] border border-[#EFE7E4] rounded-xl text-apple-text font-mono text-xs focus:outline-none focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/15"
+                />
+              </div>
             </div>
 
             {/* Sales Channel */}
@@ -267,7 +290,7 @@ export const SalesPage: React.FC = () => {
             </div>
             <div className="apple-card p-5 bg-white border border-[#EFE7E4]">
               <span className="text-[11px] font-mono text-apple-text-secondary">Units Sold</span>
-              <div className="font-bold text-2xl text-apple-text mt-1">{totalUnits.toLocaleString()}</div>
+              <div className="font-bold text-2xl text-apple-text mt-1">{formatIndianNumber(totalUnits)}</div>
             </div>
             <div className="apple-card p-5 bg-white border border-[#EFE7E4]">
               <span className="text-[11px] font-mono text-apple-text-secondary">Gross Revenue</span>
@@ -317,7 +340,7 @@ export const SalesPage: React.FC = () => {
                           <div className="font-mono text-[10px] text-[#B76E79] font-medium">{s.sku}</div>
                         </td>
                         <td className="py-3 px-4 text-right font-mono font-medium text-apple-text">
-                          {s.quantity}
+                          {formatIndianNumber(s.quantity)}
                         </td>
                         <td className="py-3 px-4 text-right font-mono font-semibold text-[#B76E79]">
                           {formatCurrency(s.total_price)}
